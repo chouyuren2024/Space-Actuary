@@ -1,0 +1,366 @@
+// 遊戲資料：所有數值都對照真實太空工程，來源記錄在 docs/REFERENCES.md。
+// 顯示用文字一律透過 js/i18n.js 的 t() 依 id 查詢，這裡只放數值。
+
+const G0 = 9.80665; // m/s²，標準重力加速度（火箭方程式用）
+const VISIBLE_WAVELENGTH_M = 550e-9; // 可見光波長，用於繞射極限解析度
+
+const ORBITS = [
+  {
+    id: "leo",
+    altitudeKm: 550,
+    designLifeYears: 5,
+    dvInsertKmS: 0,
+    dvOpsKmS: 0.15, // 軌道維持＋任務結束後 5 年內離軌（FCC 規定）
+    sunlightFactor: 0.62, // 每圈約 35 分鐘在地球陰影中
+    contactHoursPerDay: 0.6, // 單一地面站每天約 3–4 次、每次約 10 分鐘
+    radiationFactor: 1.0,
+    capacityKey: "leo",
+  },
+  {
+    id: "geo",
+    altitudeKm: 35786,
+    designLifeYears: 15,
+    dvInsertKmS: 1.83, // 從卡納維爾角（傾角 28.5°）的 GTO 圓化成 GEO
+    dvOpsKmS: 0.75, // 南北位置保持約 50 m/s/年 × 15 年
+    sunlightFactor: 0.85, // 幾乎全日照，但太陽能板 15 年會衰退
+    contactHoursPerDay: 24,
+    radiationFactor: 1.5, // 位於外范艾倫帶邊緣，輻射環境比 LEO 嚴苛
+    capacityKey: "gto",
+  },
+];
+
+// 火箭：真實價格與運力（可回收構型），可靠度用飛行紀錄以拉普拉斯接續法則估計
+// PSLV 只能送到次同步轉移軌道（284 × 20,650 km、傾角約 18°），圓化成 GEO 比從卡納維爾角的 GTO 多約 0.16 km/s
+const ROCKETS = [
+  { id: "light", costM: 7.5, capacityKg: { leo: 200, gto: 0 }, flights: 88, successes: 84 },
+  { id: "pslv", costM: 25, capacityKg: { leo: 1750, gto: 1425 }, flights: 64, successes: 59, geoTransferExtraDvKmS: 0.16 },
+  { id: "medium", costM: 74, capacityKg: { leo: 17500, gto: 5500 }, flights: 690, successes: 687 },
+  { id: "heavy", costM: 97, capacityKg: { leo: 57000, gto: 8000 }, flights: 13, successes: 13 },
+];
+
+// 拉普拉斯接續法則：(成功次數 + 1) / (總次數 + 2)
+function rocketReliability(rocket) {
+  return (rocket.successes + 1) / (rocket.flights + 2);
+}
+
+// 衛星本體（電腦、熱控、線路）：每顆衛星都需要，不讓玩家選
+// 衛星本體的共用部分（配電、線束、熱控）。衛星電腦另外選，見 SUBSYSTEMS.computer；
+// 原本 20 kg／20 W／$4M 含一台標準電腦，拆出來後扣掉標準電腦，預設設計的數值不變
+const BUS_CORE = { massKg: 18, powerW: 15, costM: 2.5, grade: "qualified" };
+
+// 地球磁場強度和距離的立方成反比；磁力棒的指向精度以 LEO 550 km 為基準換算
+const EARTH_RADIUS_KM_FOR_FIELD = 6371;
+const MAGNETORQUER_REFERENCE_ALTITUDE_KM = 550;
+const UNCONTROLLED_POINTING_DEG = 90; // 等效指向誤差超過這個值，就是根本控制不了
+
+// 零件等級：商規（COTS）／太空級（qualified）／太空級＋冗餘備份（redundant）
+// 數值為「在 LEO 運作 5 年仍正常」的機率，其他軌道與年限依故障率換算
+const GRADE_RELIABILITY_LEO_5YR = { cots: 0.9, qualified: 0.97, redundant: 0.995 };
+const GRADE_REFERENCE_YEARS = 5;
+const DEPLOY_MECHANISM_RELIABILITY = 0.99; // 每個需要展開的機構（太陽能板、天線）
+
+const SUBSYSTEMS = {
+  // 電力系統選的是「技術」，太陽能板依用電需求自動決定大小（見 js/mission.js 的 powerSystemSpec）
+  // 質量 = 基本質量 + 額定功率 ÷ 比功率（含電池與電源控制）；成本 = 基本成本 + 每 kW 成本
+  // 機身貼附式只能用衛星外殼的面積，額定功率有上限
+  power: [
+    { id: "economy", wPerKg: 25, baseMassKg: 2, baseCostM: 0.5, costPerKwM: 4, maxRatedW: 300, grade: "cots", deployables: 0 },
+    { id: "standard", wPerKg: 35, baseMassKg: 5, baseCostM: 2, costPerKwM: 2.6, maxRatedW: Infinity, grade: "qualified", deployables: 1 },
+    { id: "premium", wPerKg: 70, baseMassKg: 8, baseCostM: 4, costPerKwM: 3.2, maxRatedW: Infinity, grade: "redundant", deployables: 1 },
+  ],
+  comm: [
+    // 下傳速率（Mbps）：同樣硬體到 GEO 距離變成約 65 倍，訊號剩約 1/4,200（平方反比）
+    { id: "economy", rateMbps: { leo: 5, geo: 0.0012 }, powerW: 15, massKg: 2, costM: 0.5, grade: "cots", deployables: 0 },
+    { id: "standard", rateMbps: { leo: 800, geo: 0.19 }, powerW: 120, massKg: 25, costM: 6, grade: "qualified", deployables: 1 },
+    { id: "premium", rateMbps: { leo: 2000, geo: 130 }, powerW: 250, massKg: 60, costM: 18, grade: "redundant", deployables: 1 },
+  ],
+  attitude: [
+    // 指向精度（度）。磁力棒靠地球磁場產生力矩，磁場越弱越控制不住
+    { id: "economy", pointingDeg: 2, magnetic: true, powerW: 5, massKg: 3, costM: 0.5, grade: "qualified" },
+    { id: "standard", pointingDeg: 0.02, magnetic: false, powerW: 40, massKg: 20, costM: 4, grade: "qualified" },
+    { id: "premium", pointingDeg: 0.02, magnetic: false, powerW: 55, massKg: 28, costM: 6.5, grade: "redundant" },
+  ],
+  // 衛星電腦＝整套指令與資料處理系統（C&DH）：電腦板＋固態記錄器＋線束＋飛行軟體開發驗證，
+  // 所以質量、成本比單一電腦板大得多。dataGbitPerDay 是每天能處理、存下、排隊下傳的資料量。
+  // 三種各有長處：最貴的抗輻射電腦「買的是不會壞，不是算力」，處理量反而比大容量型少
+  computer: [
+    { id: "economy", dataGbitPerDay: 100, powerW: 1, massKg: 0.5, costM: 0.3, grade: "cots" }, // NanoMind A3200 級
+    { id: "standard", dataGbitPerDay: 4000, powerW: 5, massKg: 2, costM: 1.5, grade: "qualified" }, // EnduroSat OBC＋大容量儲存
+    { id: "premium", dataGbitPerDay: 1000, powerW: 25, massKg: 10, costM: 8, grade: "redundant" }, // RAD750 級，雙機備份
+  ],
+  structure: [
+    // 結構質量為其他乾質量的比例；輻射倍率越低代表屏蔽越好
+    { id: "economy", massFraction: 0.1, costM: 1, radiationMultiplier: 1.6, launchSurvival: 0.97, impactRisk: 0.08 },
+    { id: "standard", massFraction: 0.18, costM: 5, radiationMultiplier: 1.0, launchSurvival: 0.995, impactRisk: 0.03 },
+    { id: "premium", massFraction: 0.25, costM: 12, radiationMultiplier: 0.6, launchSurvival: 0.999, impactRisk: 0.01 },
+  ],
+};
+
+// 任務酬載依任務類型而不同：光學相機／望遠鏡，或通訊轉發器
+const PAYLOADS = {
+  optical: [
+    { id: "economy", apertureM: 0.09, bands: 4, dataGbitPerDay: 20, powerW: 20, massKg: 5, costM: 2, grade: "cots" },
+    { id: "standard", apertureM: 0.5, bands: 16, dataGbitPerDay: 500, powerW: 250, massKg: 200, costM: 35, grade: "qualified" },
+    { id: "premium", apertureM: 1.1, bands: 29, dataGbitPerDay: 3000, powerW: 600, massKg: 700, costM: 80, grade: "redundant" },
+  ],
+  transponder: [
+    { id: "economy", throughputGbps: 1, powerW: 1500, massKg: 250, costM: 20, grade: "cots" },
+    { id: "standard", throughputGbps: 10, powerW: 4500, massKg: 600, costM: 50, grade: "qualified" },
+    // 高通量酬載很重：ViaSat-1（140 Gbps）發射質量約 6.7 噸
+    { id: "premium", throughputGbps: 100, powerW: 12000, massKg: 2200, costM: 90, grade: "redundant" },
+  ],
+  // 電離層電漿儀器：quantities 為能量測的物理量數目（福衛五號 AIP 量 6 項；加上掩星接收機多了垂直剖面）
+  plasma: [
+    { id: "economy", quantities: 2, dataGbitPerDay: 0.2, powerW: 2, massKg: 1, costM: 1, grade: "cots" },
+    { id: "standard", quantities: 6, dataGbitPerDay: 2, powerW: 5, massKg: 5, costM: 5, grade: "qualified" },
+    { id: "premium", quantities: 7, dataGbitPerDay: 4, powerW: 55, massKg: 12, costM: 14, grade: "redundant" },
+  ],
+};
+
+const SUBSYSTEM_KEYS = ["power", "comm", "payload", "attitude", "structure", "computer"];
+
+// 熱預算（只顯示，不影響任務價值）：用掉的電最後幾乎都變成熱，要靠散熱面輻射到太空。
+// 每平方公尺散熱面的淨散熱量 ≈ εσT⁴ − 吸收的地球紅外線與反照（ε 0.85、20°C 時 εσT⁴ ≈ 355 W/m²）
+const RADIATOR_NET_FLUX_W_M2 = { leo: 250, geo: 330 };
+const THERMAL_METHODS = [
+  { id: "passive", maxW: 1000 }, // 多層隔熱毯＋散熱面
+  { id: "heat_pipes", maxW: 5000 }, // 熱管把熱帶到散熱面
+  { id: "loop_heat_pipes", maxW: Infinity }, // 迴路熱管＋可展開散熱板
+];
+const TIER_IDS = ["economy", "standard", "premium"];
+
+// 推進系統：比衝（Isp）決定同樣推進劑能產生多少 Δv
+const FUELS = [
+  { id: "hydrazine", isp: 220, dryMassKg: 15, costM: 2, electric: false, powerW: 0, toxic: true },
+  { id: "af_m315e", isp: 245, dryMassKg: 15, costM: 3, electric: false, powerW: 0, toxic: false },
+  { id: "biprop", isp: 320, dryMassKg: 40, costM: 5, electric: false, powerW: 0, toxic: true },
+  { id: "hall", isp: 1600, dryMassKg: 35, costM: 8, electric: true, powerW: 1350, toxic: false },
+  { id: "ion", isp: 3100, dryMassKg: 50, costM: 12, electric: true, powerW: 2300, toxic: false },
+];
+
+const TOXIC_HANDLING_COST_M = 2; // 毒性推進劑加注需要 SCAPE 防護作業
+const PROPELLANT_MAX_KG = 6000;
+const PROPELLANT_STEP_KG = 5; // 小衛星只需要幾公斤推進劑，調整單位不能太粗
+const AUTO_PROPELLANT_MARGIN = 0.1; // 「自動計算」預留 10% Δv 餘量
+
+// 電推進：低推力螺旋爬升比脈衝式轉移多耗 Δv，而且要花數個月穿越范艾倫輻射帶
+const ELECTRIC_TRANSFER_DV_FACTOR = 1.3;
+const ELECTRIC_TRANSFER_YEARS = 0.5;
+// 電推進器可以降功率運轉（NSTAR 可在 0.5–2.3 kW 之間調節），但可用電力低於額定的約 1/4 就點不著
+const ELECTRIC_MIN_POWER_FRACTION = 0.25;
+const RADIATION_BELT_FACTOR = 3;
+
+const STAGES = [
+  { id: "liftoff" },
+  { id: "ascent" },
+  { id: "insertion" },
+  { id: "deployment" },
+  { id: "operation" },
+];
+
+// 發射失敗中，約 3 成發生在剛起飛，其餘在爬升段
+const LIFTOFF_SHARE_OF_LAUNCH_FAILURE = 0.3;
+
+// 任務目標：每種任務在不同軌道的「覆蓋率」都來自真實幾何限制
+// budgetM：任務預算（百萬美元），依軌道而定。預算刻意抓緊：把每個部件都選最好的一定超支，要自己取捨
+const MISSION_OBJECTIVES = [
+  {
+    id: "imaging",
+    payloadKind: "optical",
+    coverage: { leo: 1, geo: 1 },
+    requirement: { type: "resolution", maxGsdM: 0.5 },
+    pointingDeg: 0.05, // 窄視野相機：指向偏 0.05° 在 550 km 高度就偏了約 0.5 km
+    budgetM: { leo: 145, geo: 165 },
+  },
+  {
+    id: "climate",
+    payloadKind: "optical",
+    coverage: { leo: 1, geo: 0.42 }, // GEO 只看得到 42% 的地球，看不到南北緯 81° 以上
+    requirement: { type: "bands", bands: 29, maxGsdM: 1000 },
+    pointingDeg: 0.5, // 寬刈幅（MODIS 約 2,330 km），容許的指向誤差較大
+    budgetM: { leo: 145, geo: 165 },
+  },
+  {
+    id: "weather",
+    payloadKind: "optical",
+    coverage: { leo: 2 / 144, geo: 1 }, // 需要每 10 分鐘一張（每天 144 張），LEO 每天只經過約 2 次
+    requirement: { type: "bands", bands: 16, maxGsdM: 2000 },
+    pointingDeg: 0.05, // 從 36,000 km 外拍 2 km 解析度，每個像素只有約 0.003°
+    budgetM: { leo: 140, geo: 160 },
+  },
+  {
+    id: "comms",
+    payloadKind: "transponder",
+    coverage: { leo: 35 / 1440, geo: 1 }, // 單顆 LEO 衛星每天只在頭頂出現約 35 分鐘
+    requirement: { type: "throughput", gbps: 30 },
+    pointingDeg: 0.1, // 點波束寬度約 0.5°，天線指向誤差要遠小於波束寬度
+    budgetM: { leo: 230, geo: 250 },
+  },
+  {
+    // 電離層要「身在其中」才量得到：F 層電子密度峰值約在 250–400 km，頂部延伸到約 1,000 km；
+    // GEO（35,786 km）遠在電離層之外，所以覆蓋為 0
+    id: "ionosphere",
+    payloadKind: "plasma",
+    coverage: { leo: 1, geo: 0 },
+    requirement: { type: "quantities", count: 7 },
+    pointingDeg: 2, // 探針只要大致朝向飛行方向；離子漂移靠精確「知道」姿態來修正，不需要精確「控制」
+    budgetM: { leo: 40, geo: 40 },
+  },
+];
+
+function missionBudgetM(objective, orbit) {
+  return objective.budgetM[orbit.id];
+}
+
+// 劇情關卡過關門檻：交付的任務價值
+const CAMPAIGN_PASS_VALUE = 0.5;
+
+// 戰役關卡的 feature flag。level 為 null 代表自由遊玩（全開）。
+function getCampaignFeatures(level) {
+  if (!level) return { orbit: true, fuel: true, attitude: true, computer: true, events: true, operations: true, forcedEventId: null };
+  return {
+    orbit: true,
+    fuel: level >= 2,
+    attitude: level >= 2,
+    computer: level >= 3, // 第 3 關講太空輻射，同時開放選衛星電腦
+    events: level >= 3,
+    operations: level >= 4,
+    forcedEventId: level === 3 ? "solar_flare" : null,
+  };
+}
+
+// ---------- 運作期：預備金、異常決策、延長任務 ----------
+
+const EXTENDED_MISSION_COST_PER_YEAR_M = 4; // 延長任務每年的地面操作成本
+const EXTENSION_MAX_FRACTION = 0.5; // 延長任務最多設計壽命的一半
+const RECOVERABLE_ANOMALY_SHARE = 0.6; // 零件故障中能靠地面團隊挽救的比例
+const OPS_EVENT_RATE_PER_YEAR = { leo: 0.3, geo: 0.1 };
+const EV_SIMULATION_RUNS = 800;
+const EV_SIMULATION_SEED = 20261115;
+
+// 零件故障的應變選項。effect 欄位：
+//   multiply：任務價值產出倍率；lifeMultiply：剩餘推進劑壽命倍率
+//   successChance + onFail：有機率失敗的修復
+const COMPONENT_ANOMALIES = {
+  power: {
+    id: "battery_fade",
+    options: [
+      { id: "reconfigure", costM: 6, effect: {} },
+      { id: "reduce_duty", costM: 0, effect: { multiply: 0.5 } },
+    ],
+  },
+  comm: {
+    id: "transmitter_fault",
+    options: [
+      { id: "big_antenna", costM: 4, effect: { multiply: 0.8 } },
+      { id: "low_gain", costM: 0, effect: { multiply: 0.25 } },
+    ],
+  },
+  payload: {
+    id: "instrument_fault",
+    options: [
+      { id: "patch", costM: 8, effect: { successChance: 0.5, onFail: { multiply: 0.78 } } },
+      { id: "degraded", costM: 0, effect: { multiply: 0.78 } },
+    ],
+  },
+  propulsion: {
+    id: "valve_stuck",
+    options: [
+      { id: "new_procedure", costM: 5, effect: {} },
+      { id: "backup_thrusters", costM: 0, effect: { lifeMultiply: 0.7 } },
+    ],
+  },
+  attitude: {
+    id: "reaction_wheel",
+    options: [
+      { id: "new_software", costM: 10, effect: { multiply: 0.9 } },
+      { id: "solar_pressure", costM: 0, effect: { multiply: 0.6 } },
+    ],
+  },
+  bus: {
+    id: "computer_upset",
+    options: [
+      { id: "patch_firmware", costM: 3, effect: {} },
+      { id: "safe_mode_debug", costM: 0, effect: { lostYears: 0.1 } },
+    ],
+  },
+};
+
+// 只有磁力棒的衛星沒有反應輪，姿態控制故障時是磁力棒線圈斷路
+const TORQUER_ANOMALY = {
+  id: "torquer_fault",
+  options: [
+    { id: "two_axis_control", costM: 2, effect: { multiply: 0.9 } },
+    { id: "spin_stabilize", costM: 0, effect: { multiply: 0.5 } },
+  ],
+};
+
+function componentAnomaly(subsystem, design) {
+  if (subsystem === "attitude" && design.parts.attitude.magnetic) return TORQUER_ANOMALY;
+  return COMPONENT_ANOMALIES[subsystem];
+}
+
+// 非故障的運作期事件
+const OPS_EVENTS = [
+  {
+    id: "conjunction",
+    weight: { leo: 3, geo: 1 },
+    options: [
+      { id: "maneuver", costM: 0, effect: { dvCostKmS: 0.01 } },
+      { id: "accept_risk", costM: 0, effect: { fatalChance: 0.002 } },
+    ],
+  },
+  {
+    id: "storm_warning",
+    weight: { leo: 2, geo: 2 },
+    options: [
+      { id: "safe_mode", costM: 0, effect: { lostYears: 3 / 365 } },
+      { id: "keep_operating", costM: 0, effect: { anomalyChance: 0.05 } },
+    ],
+  },
+  {
+    id: "ground_outage",
+    weight: { leo: 2, geo: 0 },
+    options: [
+      { id: "rent_network", costM: 2, effect: {} },
+      { id: "wait_repair", costM: 0, effect: { lostYears: 30 / 365 } },
+    ],
+  },
+];
+
+const EVENTS = [
+  { id: "solar_flare", weight: 1, effect: { radiationMultiplier: 1.5 } },
+  { id: "geomagnetic_storm", weight: 1, effect: { leoExtraDvKmS: 0.05, geoPowerHazardMultiplier: 2 } },
+  { id: "bad_weather", weight: 1, effect: { budgetDeltaM: -5 } },
+  { id: "small_debris", weight: 1, effect: { impactCheck: true } },
+  { id: "orbital_congestion", weight: 1, effect: { leoExtraDvKmS: 0.03 } },
+  { id: "limited_ground_station", weight: 1, effect: { leoContactMultiplier: 0.5 } },
+  { id: "mass_growth", weight: 1, effect: { dryMassMultiplier: 1.15 } },
+  { id: "budget_cut", weight: 1, effect: { budgetDeltaM: -20 } },
+  // 限制型事件：改變能選的零件或火箭，逼你換一套設計
+  { id: "export_control", weight: 1, effect: { bannedTiers: ["premium"] } },
+  { id: "launch_manifest", weight: 1, effect: { bannedRockets: ["medium"] } },
+  { id: "flagship", weight: 1, effect: { requiredPayloadTier: "premium", budgetDeltaM: 20 } },
+  { id: "nominal", weight: 3, effect: {} },
+];
+
+// 限制型事件下，某個選項能不能選。key 為 "rocket" 或零件類別（power、comm、payload、structure）
+function isOptionAvailable(event, key, option) {
+  const effect = (event && event.effect) || {};
+  if (key === "rocket") return !(effect.bannedRockets || []).includes(option.id);
+  if ((effect.bannedTiers || []).includes(option.id)) return false;
+  if (key === "payload" && effect.requiredPayloadTier && option.id !== effect.requiredPayloadTier) return false;
+  return true;
+}
+
+function pickRandomEvent(forcedId) {
+  if (forcedId) return EVENTS.find((e) => e.id === forcedId) || EVENTS[EVENTS.length - 1];
+
+  const totalWeight = EVENTS.reduce((sum, e) => sum + e.weight, 0);
+  let roll = Math.random() * totalWeight;
+  for (const event of EVENTS) {
+    roll -= event.weight;
+    if (roll <= 0) return event;
+  }
+  return EVENTS[EVENTS.length - 1];
+}
