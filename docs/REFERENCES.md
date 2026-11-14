@@ -112,7 +112,7 @@
 
 - 地球磁場近似偶極場，強度 ∝ 1/r³：(42,157 km ÷ 6,921 km)³ ≈ 226，直接計算
 - NASA FASTSAT-HSV01（約 180 kg）僅用三根互相垂直的磁力棒控制姿態：Design and Integration of an All-Magnetic Attitude Control System for FASTSAT-HSV01's Multiple Pointing Objectives（梁詠為提供）
-- 韋伯太空望遠鏡 6 顆反應輪，單顆 6,000 rpm 時角動量 68 N·m·s：The Design, Verification, and Performance of the James Webb Space Telescope（梁詠為提供）
+- 韋伯太空望遠鏡 6 顆反應輪，單顆 6,000 rpm 時角動量 68 N·m·s：The Design, Verification, and Performance of the James Webb Space[The Design, Verification and Performance of the James Webb Space Telescope](https://ntrs.nasa.gov/citations/20230009106)
 - 克卜勒太空望遠鏡 4 顆反應輪、需要 3 顆才能精確指向，2013 年第二顆失效後改為 K2 任務：廣為記載
 - 哈伯 2021 年 6 月酬載電腦故障，安全模式約一個月後切換到備援硬體恢復：NASA 公開新聞
 - 遊戲中的指向精度（磁力棒 2°、反應輪 0.02°）與各任務的指向需求為**遊戲估算值**，量級符合小衛星磁力棒控制（數度）與星象儀＋反應輪（百分之一度級）的典型表現
@@ -120,9 +120,9 @@
 ### 熱控（梁詠為整理）
 
 - 散熱面輻射：史蒂芬－波茲曼定律，ε = 0.85、20°C 時 εσT⁴ ≈ 355 W/m²；扣掉地球紅外線與反照後的淨散熱量（LEO 250、GEO 330 W/m²）為**遊戲估算值**
-- 福衛五號太陽能板背部散熱面：Solar Panel Temperature Reduction Study of FORMOSAT-5 Satellite（梁詠為提供）
-- 迴路熱管：Propylene Loop Heat Pipe Design and Thermal Performance（NASA PACE，梁詠為提供）；大型通訊衛星使用熱管與可展開散熱板為業界常識
-- 衛星熱控綜述：Advances in satellite thermal management systems: Challenges, innovations, and future directions（梁詠為提供）
+- 福衛五號太陽能板背部散熱面：[Solar Panel Temperature Reduction Study of FORMOSAT-5 Satellite](https://www.airitilibrary.com/Article/Detail/19907710-201106-201108030008-201108030008-111-117)
+- 迴路熱管：[Propylene Loop Heat Pipe Design and Thermal Performance](https://tfaws.nasa.gov/wp-content/uploads/TFAWS23-PT-19-Paper.pdf)（NASA PACE）；大型通訊衛星使用熱管與可展開散熱板為業界常識
+- 衛星熱控綜述：[Advances in satellite thermal management systems: Challenges, innovations, and future directions](https://www.sciencedirect.com/science/article/pii/S0094576526000883)
 
 ### 運作期軌道畫面的地球
 
