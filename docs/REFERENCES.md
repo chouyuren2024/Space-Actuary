@@ -10,6 +10,14 @@
 
 遊戲的每個機制都對應真實的太空工程原理。下列數字直接寫在 `js/data.js`，括號內是遊戲裡的用法。
 
+### NASA官方資料使用（周宥任整理）
+- 科學任務的設計與開發[官方提供](https://www.nasa.gov/wp-content/uploads/2025/04/250323-design-and-develop-science-mission.pdf?emrc=a454cf)：概述了用於開發科學空間任務的系統工程方法。它解釋了任務如何從最初的科學需求出發，經過需求定義、設計、驗證和實施等各個階段。本次參考文中的開發指引
+- 任務設計實驗室[官方提供](https://etd.gsfc.nasa.gov/capabilities/integrated-design-center/mission-design-lab/)： NASA 的任務設計實驗室是一個協作環境，工程師和科學家可以在這裡快速開發和評估太空任務概念。它有助於將最初的想法轉化為經過技術評估的任務設計。本次黑客松使用本網站的設計指引進行設計
+- NASA任務視覺化[官方提供](https://nasa.github.io/mission-viz/): 參考視覺化方法
+- 一款關於望遠鏡的學習遊戲[官方提供](https://science.nasa.gov/mission/webb/game-scope-it-out/): 參考遊戲設計邏輯與教學
+- 立方體衛星入門101－初次接觸立方體衛星的開發者的基本概念和流程[官方提供](https://www3.nasa.gov/sites/default/files/atoms/files/nasa_csli_cubesat_101_508.pdf): 參考衛星各次系統設計
+- 加拿大航太局（CSA）數位遊戲和活動[官方提供](https://www.asc-csa.gc.ca/eng/youth-educators/digital-games-and-activities.asp): 參考遊戲設計
+
 ### 火箭：價格、運力、飛行紀錄
 
 - Falcon 9：[Falcon 9 — Wikipedia](https://en.wikipedia.org/wiki/Falcon_9) — 回收構型 LEO 17,500 kg、GTO 5,500 kg；2026 年商業發射價約 $74M；690 次發射、687 次成功（CRS-7 與 Starlink Group 9-3 兩次失敗、CRS-1 一次部分失敗）
