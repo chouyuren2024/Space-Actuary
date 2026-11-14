@@ -1,239 +1,237 @@
-# 參考資料
+# References
 
-這份文件記錄專案裡引用到的外部資料來源，主要是「成就展示」頁面裡每個成就搭配的太空史小知識。每條都已重新查證，附上官方或可靠來源連結，方便繳交時附上引用，也方便之後複查事實正確性。
+This document records the external data sources cited throughout the project, primarily the space history trivia paired with each achievement on the "Achievements" showcase screen.
 
-## 挑戰本身
+## The Challenge Itself
 
-- [NASA Space Apps Challenge 2026 — Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/) — 官方挑戰頁面，本專案的需求與難度定位依據
+- [NASA Space Apps Challenge 2026 — Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/) — Official challenge page; serves as the basis for the project's requirements and difficulty calibration.
 
-## 任務模型 v2 的真實數據
+## Real-World Data in the Mission Model
 
-遊戲的每個機制都對應真實的太空工程原理。下列數字直接寫在 `js/data.js`，括號內是遊戲裡的用法。
+Every mechanic in the game is grounded in real space engineering principles. The figures below are hardcoded in `js/data.js`, with parenthetical notes explaining their in-game usage.
 
-### NASA官方資料使用（周宥任整理）
-- 科學任務的設計與開發[官方提供](https://www.nasa.gov/wp-content/uploads/2025/04/250323-design-and-develop-science-mission.pdf?emrc=a454cf)：概述了用於開發科學空間任務的系統工程方法。它解釋了任務如何從最初的科學需求出發，經過需求定義、設計、驗證和實施等各個階段。本次參考文中的開發指引
-- 任務設計實驗室[官方提供](https://etd.gsfc.nasa.gov/capabilities/integrated-design-center/mission-design-lab/)： NASA 的任務設計實驗室是一個協作環境，工程師和科學家可以在這裡快速開發和評估太空任務概念。它有助於將最初的想法轉化為經過技術評估的任務設計。本次黑客松使用本網站的設計指引進行設計
-- NASA任務視覺化[官方提供](https://nasa.github.io/mission-viz/): 參考視覺化方法
-- 一款關於望遠鏡的學習遊戲[官方提供](https://science.nasa.gov/mission/webb/game-scope-it-out/): 參考遊戲設計邏輯與教學
-- 立方體衛星入門101－初次接觸立方體衛星的開發者的基本概念和流程[官方提供](https://www3.nasa.gov/sites/default/files/atoms/files/nasa_csli_cubesat_101_508.pdf): 參考衛星各次系統設計
-- 加拿大航太局（CSA）數位遊戲和活動[官方提供](https://www.asc-csa.gc.ca/eng/youth-educators/digital-games-and-activities.asp): 參考遊戲設計
+### Official NASA Resources Used (Compiled by You-Ren Zhou)
+- **Design and Development of Science Missions** [Official Resource](https://www.nasa.gov/wp-content/uploads/2025/04/250323-design-and-develop-science-mission.pdf?emrc=a454cf): Outlines the systems engineering methodology used to develop scientific space missions, explaining how missions progress from initial science requirements through definition, design, verification, and implementation. Used as a development guide for this project.
+- **Mission Design Lab** [Official Resource](https://etd.gsfc.nasa.gov/capabilities/integrated-design-center/mission-design-lab/): NASA's Mission Design Lab is a collaborative environment where engineers and scientists rapidly develop and evaluate space mission concepts, turning initial ideas into technically vetted mission designs. Used as a design guide during this hackathon.
+- **NASA Mission Visualization** [Official Resource](https://nasa.github.io/mission-viz/): Referenced for visualization approaches.
+- **Scope It Out! (Telescope Learning Game)** [Official Resource](https://science.nasa.gov/mission/webb/game-scope-it-out/): Referenced for educational game design logic.
+- **CubeSat 101: Basic Concepts and Processes for First-Time CubeSat Developers** [Official Resource](https://www3.nasa.gov/sites/default/files/atoms/files/nasa_csli_cubesat_101_508.pdf): Referenced for satellite subsystem design.
+- **Canadian Space Agency (CSA) Digital Games and Activities** [Official Resource](https://www.asc-csa.gc.ca/eng/youth-educators/digital-games-and-activities.asp): Referenced for game design inspiration.
 
-### 火箭：價格、運力、飛行紀錄
+### Launch Vehicles: Cost, Payload Capacity, & Flight Heritage
 
-- Falcon 9：[Falcon 9 — Wikipedia](https://en.wikipedia.org/wiki/Falcon_9) — 回收構型 LEO 17,500 kg、GTO 5,500 kg；2026 年商業發射價約 $74M；690 次發射、687 次成功（CRS-7 與 Starlink Group 9-3 兩次失敗、CRS-1 一次部分失敗）
-- Falcon Heavy：[Falcon Heavy — Wikipedia](https://en.wikipedia.org/wiki/Falcon_Heavy) — 三節全回收時 GTO 8 t、側助推器回收時 LEO 約 57 t；回收構型報價 $97M；13 次發射全部成功
-- Electron：[Rocket Lab Electron — Wikipedia](https://en.wikipedia.org/wiki/Rocket_Lab_Electron) — SSO 200 kg（遊戲的 LEO 任務都是地球觀測，採用 SSO 運力）、每次約 $7.5M；97 次發射（含 9 次亞軌道 HASTE），4 次失敗。遊戲只計入軌道發射：88 次、84 次成功
-- 2025 年紀錄佐證：[Rocket Lab ends 2025 with 21 launches — Barchart](https://www.barchart.com/story/news/36733390/rocket-lab-successfully-launches-for-iqps-ends-2025-with-21-launches-and-100-mission-success)
-- 可靠度估計：拉普拉斯接續法則（(成功+1)/(總次數+2)），統計學標準方法，用來說明「樣本少的火箭不能當成 100% 可靠」
+- **Falcon 9:** [Falcon 9 — Wikipedia](https://en.wikipedia.org/wiki/Falcon_9) — Reusable configuration: 17,500 kg to LEO, 5,500 kg to GTO; ~2026 commercial launch price ~$74M; 690 launches, 687 successes (two failures: CRS-7 and Starlink Group 9-3; one partial failure: CRS-1).
+- **Falcon Heavy:** [Falcon Heavy — Wikipedia](https://en.wikipedia.org/wiki/Falcon_Heavy) — 8 t to GTO with three-core recovery, ~57 t to LEO with side-booster recovery; reusable launch price $97M; 13 launches, 100% success rate.
+- **Electron:** [Rocket Lab Electron — Wikipedia](https://en.wikipedia.org/wiki/Rocket_Lab_Electron) — 200 kg to SSO (all in-game LEO missions are Earth observation, so SSO capacity is used), ~$7.5M per launch; 97 total launches (including 9 suborbital HASTE flights) with 4 failures. The game counts only orbital launches: 88 launches, 84 successes.
+- **2025 Flight Record Verification:** [Rocket Lab ends 2025 with 21 launches — Barchart](https://www.barchart.com/story/news/36733390/rocket-lab-successfully-launches-for-iqps-ends-2025-with-21-launches-and-100-mission-success)
+- **Reliability Estimation:** Laplace's rule of succession ($(s + 1)/(n + 2)$), a standard statistical method used to demonstrate why low-sample rockets cannot be treated as 100% reliable.
 
-> Falcon 9／Falcon Heavy 的 SSO 運力略低於 LEO，但仍遠超過遊戲中任何衛星的質量，所以直接使用 LEO 數字。
+> Falcon 9 and Falcon Heavy have slightly lower SSO capacities than LEO capacities, but both still vastly exceed any satellite mass in the game, so LEO figures are used directly.
 
-### 軌道力學
+### Orbital Mechanics
 
-- GTO→GEO 圓化 1,831 m/s（卡納維爾角 28.5°）：[MIT 16.512 Rocket Propulsion, Lecture 34](https://ocw.mit.edu/courses/16-512-rocket-propulsion-fall-2005/768501e0e6a9ea6ef794c2866ea1bd63_lecture_34.pdf)
-- GEO 南北位置保持約 50 m/s/年、東西約 2–5 m/s/年：[Orbital station-keeping — Wikipedia](https://en.wikipedia.org/wiki/Orbital_station-keeping)（遊戲用 15 年 × 50 m/s = 0.75 km/s）
-- 全電推衛星轉移到 GEO 約需 6 個月：[Eutelsat 115 West B — Wikipedia](https://en.wikipedia.org/wiki/Eutelsat_115_West_B)（Boeing 702SP，2015 年與 ABS-3A 疊在同一枚 Falcon 9 發射）
-- 低推力螺旋轉移的 Δv 高於脈衝式轉移：多篇文獻指出（例：[Optimised GTO-GEO transfer using low-thrust propulsion — Strathclyde](https://pureportal.strath.ac.uk/en/publications/optimised-gto-geo-transfer-using-low-thrust-propulsion/)）。**遊戲取 1.3 倍作估算**，實際數值依軌跡最佳化而異
-- LEO 500 km：週期約 95 分鐘、蝕約 35 分鐘；太陽能板平均可用功率約為額定的 62%（340.5 W → 212 W 範例）：[EPS sizing tutorial — Valispace](https://www.valispace.com/wp-content/uploads/2018/12/EPS-sizing-tutorial-1.pdf)
-- LEO 單一地面站每天約 3–4 次、每次約 10 分鐘可通訊：[Ground station — Orbital Radar](https://orbitalradar.com/glossary/ground-station)
-- GEO 衛星看得到約 42% 的地球、南北緯 81° 以內：[Geostationary orbit — Wikipedia](https://en.wikipedia.org/wiki/Geostationary_orbit)
-- 距離 65 倍 → 訊號約弱 4,200 倍（(35,786 ÷ 550)² ≈ 4,233，約 36 dB）：平方反比定律直接計算
-- FCC 五年離軌規定（2022 年 9 月通過）：[FCC Adopts 5-Year Rule for Deorbiting Satellites — Via Satellite](https://www.satellitetoday.com/government-military/2022/09/30/fcc-adopts-5-year-rule-for-deorbiting-satellites/)
+- **GTO → GEO Circularization Δv:** 1,831 m/s (from Cape Canaveral at 28.5° inclination): [MIT 16.512 Rocket Propulsion, Lecture 34](https://ocw.mit.edu/courses/16-512-rocket-propulsion-fall-2005/768501e0e6a9ea6ef794c2866ea1bd63_lecture_34.pdf)
+- **GEO Station-Keeping:** ~50 m/s/year North-South, ~2–5 m/s/year East-West: [Orbital station-keeping — Wikipedia](https://en.wikipedia.org/wiki/Orbital_station-keeping) (in-game: 15 years × 50 m/s = 0.75 km/s).
+- **All-Electric GEO Orbit Raising (~6 months):** [Eutelsat 115 West B — Wikipedia](https://en.wikipedia.org/wiki/Eutelsat_115_West_B) (Boeing 702SP, dual-stacked with ABS-3A on a single Falcon 9 in 2015).
+- **Low-Thrust Spiral Transfer Δv Penalty:** Multiple studies note higher Δv requirements compared to impulsive transfers (e.g., [Optimised GTO-GEO transfer using low-thrust propulsion — Strathclyde](https://pureportal.strath.ac.uk/en/publications/optimised-gto-geo-transfer-using-low-thrust-propulsion/)). **The game uses a 1.3× multiplier** as an estimate; actual values vary by trajectory optimization.
+- **LEO 500 km Sunlight Factor:** ~95-minute orbital period, ~35-minute eclipse; average available solar array power is ~62% of rated output (e.g., 340.5 W → 212 W): [EPS sizing tutorial — Valispace](https://www.valispace.com/wp-content/uploads/2018/12/EPS-sizing-tutorial-1.pdf)
+- **LEO Ground Contact Windows:** ~3–4 passes per day over a single ground station, ~10 minutes per pass: [Ground station — Orbital Radar](https://orbitalradar.com/glossary/ground-station)
+- **GEO Earth Coverage:** Sees ~42% of Earth's surface, up to ±81° latitude: [Geostationary orbit — Wikipedia](https://en.wikipedia.org/wiki/Geostationary_orbit)
+- **Free-Space Path Loss (65× distance → ~4,200× weaker signal):** $(35,786 \div 550)^2 \approx 4,233$ (~36 dB), calculated directly via the inverse-square law.
+- **FCC 5-Year Deorbit Rule (Adopted September 2022):** [FCC Adopts 5-Year Rule for Deorbiting Satellites — Via Satellite](https://www.satellitetoday.com/government-military/2022/09/30/fcc-adopts-5-year-rule-for-deorbiting-satellites/)
 
-### 推進系統（比衝）
+### Propulsion Systems (Specific Impulse)
 
-- 聯胺約 220 s：[A Survey of Hydrazine Monopropellant Thrusters — AIAA](https://arc.aiaa.org/doi/10.2514/6.2026-3090)（穩態約 215–235 s）
-- AF-M315E 約 245 s（比聯胺高約 12%）：[Green Propellant Infusion Mission (GPIM) Overview — NASA](https://www.nasa.gov/missions/tech-demonstration/green-propellant-infusion-mission-gpim-overview/)
-- MMH/NTO 雙組元約 320 s：[Liquid apogee engine — Wikipedia](https://en.wikipedia.org/wiki/Liquid_apogee_engine)
-- 霍爾推進器 SPT-100：1,350 W、比衝 1,600 s、推力約 83 mN：[SPT-100 — Wikipedia](https://en.wikipedia.org/wiki/SPT-100)
-- 柵極離子 NSTAR 約 1,900–3,100 s（取 3,100 s）：[NSTAR — Astronautix](http://www.astronautix.com/n/nstar.html)；[Deep Space 1 — Wikipedia](https://en.wikipedia.org/wiki/Deep_Space_1)
+- **Hydrazine (~220 s):** [A Survey of Hydrazine Monopropellant Thrusters — AIAA](https://arc.aiaa.org/doi/10.2514/6.2026-3090) (steady-state ~215–235 s).
+- **AF-M315E (~245 s, ~12% higher than hydrazine):** [Green Propellant Infusion Mission (GPIM) Overview — NASA](https://www.nasa.gov/missions/tech-demonstration/green-propellant-infusion-mission-gpim-overview/)
+- **MMH/NTO Bipropellant (~320 s):** [Liquid apogee engine — Wikipedia](https://en.wikipedia.org/wiki/Liquid_apogee_engine)
+- **SPT-100 Hall-Effect Thruster (1,350 W, 1,600 s $I_{sp}$, ~83 mN thrust):** [SPT-100 — Wikipedia](https://en.wikipedia.org/wiki/SPT-100)
+- **NSTAR Gridded Ion Thruster (~1,900–3,100 s; set to 3,100 s):** [NSTAR — Astronautix](http://www.astronautix.com/n/nstar.html); [Deep Space 1 — Wikipedia](https://en.wikipedia.org/wiki/Deep_Space_1)
 
-> 推進系統乾重與耗電 2,300 W（NSTAR 最大功率）為概念設計等級估算。
+> Propulsion dry masses and the 2,300 W power draw (NSTAR max power) are conceptual design-level estimates.
 
-### 酬載與子系統
+### Payloads & Subsystems
 
-- Planet Dove：約 9 cm 口徑、4 波段（RGB + NIR）、GSD 3.7–4.2 m：[PlanetScope — Planet Docs](https://docs.planet.com/data/imagery/planetscope/)
-- WorldView-3：1.1 m 口徑、29 波段、31 cm 全色解析度、617 km、2,800 kg：[WorldView-3 — eoPortal](https://eoportal.org/satellite-missions/worldview-3)
-- 繞射極限驗算：1.22 × 550 nm × 617 km ÷ 1.1 m ≈ 0.38 m，與 WorldView-3 實際 0.31 m 同量級；9 cm @ 475 km ≈ 3.5 m，與 Dove 相符
-- GOES-R ABI：16 波段、0.5–2 km、每 10 分鐘全圓盤：[ABI — NOAA GOES-R](https://drupal-prod.goesr.woc.noaa.gov/spacesegment/abi.html)
-- WorldView X 頻段下傳 800 Mbps：[WorldView-1 — eoPortal](https://www.eoportal.org/satellite-missions/worldview-1)
-- 立方衛星 S 頻段下傳約 4–14 Mbps：[ISIS High Data Rate S-band Transmitter](https://www.cubesatshop.com/product/isis-txs-s-band-transmitter/)
-- SDO：選擇傾斜地球同步軌道以取得連續連線，每天 1.4 TB、Ka 頻段約 130 Mbps：[SDO — NASA NTRS](https://ntrs.nasa.gov/api/citations/20090027804/downloads/20090027804.pdf)
-- ROSA：傳統硬式太陽能板的 3 倍比功率、iROSA 每翼 20+ kW：[ROSA — Redwire](https://rdw.com/product-archive/power/rosa/)
-- Vanguard 1（機身貼附式太陽能電池，1958）：[Vanguard 1 — Wikipedia](https://en.wikipedia.org/wiki/Vanguard_1)
-- ViaSat-1 約 140 Gbps：一般公開資料（高通量衛星代表）
-- Whipple Shield：[Whipple shield — Wikipedia](https://en.wikipedia.org/wiki/Whipple_shield)
+- **Planet Dove:** ~9 cm aperture, 4 bands (RGB + NIR), 3.7–4.2 m GSD: [PlanetScope — Planet Docs](https://docs.planet.com/data/imagery/planetscope/)
+- **WorldView-3:** 1.1 m aperture, 29 bands, 31 cm panchromatic resolution, 617 km altitude, 2,800 kg: [WorldView-3 — eoPortal](https://eoportal.org/satellite-missions/worldview-3)
+- **Diffraction Limit Verification:** $1.22 \times 550\text{ nm} \times 617\text{ km} \div 1.1\text{ m} \approx 0.38\text{ m}$, matching WorldView-3's actual 0.31 m order of magnitude; 9 cm at 475 km $\approx 3.5\text{ m}$, matching Dove.
+- **GOES-R ABI:** 16 bands, 0.5–2 km resolution, full-disk imagery every 10 minutes: [ABI — NOAA GOES-R](https://drupal-prod.goesr.woc.noaa.gov/spacesegment/abi.html)
+- **WorldView X-Band Downlink (800 Mbps):** [WorldView-1 — eoPortal](https://www.eoportal.org/satellite-missions/worldview-1)
+- **CubeSat S-Band Downlink (~4–14 Mbps):** [ISIS High Data Rate S-band Transmitter](https://www.cubesatshop.com/product/isis-txs-s-band-transmitter/)
+- **SDO (Solar Dynamics Observatory):** Uses an inclined geosynchronous orbit for continuous downlink at 1.4 TB/day via Ka-band at ~130 Mbps: [SDO — NASA NTRS](https://ntrs.nasa.gov/api/citations/20090027804/downloads/20090027804.pdf)
+- **ROSA (Roll-Out Solar Array):** 3× the specific power of traditional rigid solar arrays; iROSA delivers 20+ kW per wing: [ROSA — Redwire](https://rdw.com/product-archive/power/rosa/)
+- **Vanguard 1 (Body-mounted solar cells, 1958):** [Vanguard 1 — Wikipedia](https://en.wikipedia.org/wiki/Vanguard_1)
+- **ViaSat-1 (~140 Gbps):** Publicly available data (representative High-Throughput Satellite).
+- **Whipple Shield:** [Whipple shield — Wikipedia](https://en.wikipedia.org/wiki/Whipple_shield)
 
-### 可靠度與工程餘裕
+### Reliability & Engineering Margins
 
-- 立方衛星約 25% 入軌即失聯、另 12% 早期失效（Swartwout 統計）：[The Space Review](https://thespacereview.com/article/3047/1)
-- 概念設計階段質量餘裕 > 30%、「Layout」12–30%：AIAA S-120 / R-020A，整理於 [NASA NTRS](https://ntrs.nasa.gov/api/citations/20120013284/downloads/20120013284.pdf)
+- **CubeSat Failure Statistics:** ~25% dead-on-arrival upon orbit insertion, plus another 12% early mortality (Swartwout dataset): [The Space Review](https://thespacereview.com/article/3047/1)
+- **Mass Margins:** > 30% in conceptual design phase, 12–30% at "Layout" phase: AIAA S-120 / R-020A, summarized in [NASA NTRS](https://ntrs.nasa.gov/api/citations/20120013284/downloads/20120013284.pdf)
 
-> 零件等級的年故障率（商規 90% / 太空級 97% / 冗餘 99.5% 撐過 5 年 LEO）、展開機構 99%、GEO 輻射倍率 1.5、結構屏蔽倍率為**遊戲估算值**：方向與量級符合工程常識（商規零件在 GEO 最脆弱、冗餘最可靠），但不對應單一引用。成本（百萬美元）同樣是量級估算，用於呈現相對取捨。
+> Component-tier survival rates (5-year LEO survival: COTS 90% / Space-grade 97% / Redundant 99.5%), 99% deployment reliability, 1.5× GEO radiation multiplier, and structural shielding multipliers are **game estimates**: directionally and quantitatively consistent with engineering intuition (COTS parts are most vulnerable in GEO; redundant hardware is most reliable), without tying to a single citation. Component costs ($M) are likewise order-of-magnitude estimates calibrated to present meaningful trade-offs.
 
-### 運作期：預備金與異常應變
+### Operations Phase: Reserves & Anomaly Response
 
-- NASA 聯合成本與時程信心水準（JCL）70% 政策、未分配預備金（UFE）：[GAO-16-620](https://www.gao.gov/assets/680/678704.pdf)；[SPD-19 — NASA](https://discovery.larc.nasa.gov/PDF_FILES/SPD-19_PI-ledmissions_70JCL.pdf)
-- 碰撞機率 1/10,000 為業界閃避門檻（NASA CARA、ISS 紅線）：[NASA NTRS 20180007756](https://ntrs.nasa.gov/api/citations/20180007756/downloads/20180007756.pdf)
-- 朱諾號 2016 年氦氣止回閥異常，決定留在 53 天軌道：[NASA's Juno to Remain in Current Orbit — NASA JPL](https://www.jpl.nasa.gov/news/nasas-juno-to-remain-in-current-orbit-at-jupiter/)
-- Landsat 7 掃描線校正器 2003 年失效、修復未成功，每張影像缺約 22%：[Landsat 7 — USGS](https://www.usgs.gov/landsat-missions/landsat-7)
-- 克卜勒 2013 年第二個反應輪失效後以太陽光壓平衡進行 K2 任務（2014–2018）、哈伯 2024 年改用單陀螺儀模式、機會號（設計 90 火星日，運作至 2018 年）、2009 年銥 33／Cosmos 2251 相撞：廣為記載的太空史事件
+- **NASA Joint Cost and Schedule Confidence Level (JCL) 70% Policy & Unallocated Future Expenses (UFE):** [GAO-16-620](https://www.gao.gov/assets/680/678704.pdf); [SPD-19 — NASA](https://discovery.larc.nasa.gov/PDF_FILES/SPD-19_PI-ledmissions_70JCL.pdf)
+- **Collision Probability Threshold ($1/10,000$):** Industry standard maneuver threshold (NASA CARA, ISS red-line threshold): [NASA NTRS 20180007756](https://ntrs.nasa.gov/api/citations/20180007756/downloads/20180007756.pdf)
+- **Juno 2016 Helium Check Valve Anomaly:** Decision to remain in a 53-day science orbit: [NASA's Juno to Remain in Current Orbit — NASA JPL](https://www.jpl.nasa.gov/news/nasas-juno-to-remain-in-current-orbit-at-jupiter/)
+- **Landsat 7 Scan Line Corrector (SLC) Failure (2003):** Unrecoverable hardware fault causing ~22% data loss per scene while continuing productive science for nearly 20 years: [Landsat 7 — USGS](https://www.usgs.gov/landsat-missions/landsat-7)
+- **Historical Analogs:** Kepler K2 mission (2014–2018, balancing solar radiation pressure after losing a second reaction wheel in 2013), Hubble's transition to single-gyro mode (2024), Opportunity rover (designed for 90 sols, operated until 2018), and the 2009 Iridium 33 / Kosmos 2251 collision: widely documented space history.
 
-> 可挽救故障比例 60%、各應變選項的成本與效果、運作期事件頻率、延長任務每年 $4M，皆為**遊戲估算值**。
+> The 60% recoverable failure ratio, response option costs/effects, operational event frequencies, and $4M/year mission extension cost are **game estimates**.
 
-### 事件的真實案例
+### Real-World Event Precedents
 
-- 2022 年 2 月地磁暴導致 38 顆 Starlink 墜入大氣層：[Starlink to lose about 40 satellites — Light Reading](https://www.lightreading.com/satellite/starlink-to-lose-about-40-satellites-in-wake-of-geomagnetic-storm/d/d-id/775200)
-- 1993 年英仙座流星雨期間 Olympus-1 疑似遭撞擊失控：[Shooting Stars Can Shoot Down Satellites — IEEE Spectrum](https://spectrum.ieee.org/shooting-stars-can-shoot-down-satellites)
-- 2016 年哨兵 1A（700 km）太陽能板被小於 5 mm 的碎片擊中，損傷區直徑約 40 cm，功率小幅下降但運作正常：[Copernicus Sentinel-1A satellite hit by space particle — ESA](https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-1/Copernicus_Sentinel-1A_satellite_hit_by_space_particle)
-- 太空碎片分級：10 cm 以上可由地面雷達追蹤並閃避、1 cm 以下無法追蹤只能靠屏蔽（遊戲據此區分「軌道碎片密集」與「微小碎片密集」兩個事件）：ESA Space Debris Office 的公開說明
-- 1 cm 鋁珠（約 1.4 g）以 10 km/s 撞擊的動能 ½mv² ≈ 70 kJ，等於 250 kg 物體以 85 km/h 運動：直接計算
-- 其他事件與失敗原因引用的史實（Apollo 12 閃電、ADEOS-II、CRS-7、AsiaSat 3、伽利略號天線）均為廣為記載的太空史事件
+- **February 2022 Geomagnetic Storm:** Drag increase caused 38 Starlink satellites to re-enter: [Starlink to lose about 40 satellites — Light Reading](https://www.lightreading.com/satellite/starlink-to-lose-about-40-satellites-in-wake-of-geomagnetic-storm/d/d-id/775200)
+- **1993 Perseid Meteor Shower Anomaly:** Suspected micrometeoroid impact caused Olympus-1 to lose attitude control: [Shooting Stars Can Shoot Down Satellites — IEEE Spectrum](https://spectrum.ieee.org/shooting-stars-can-shoot-down-satellites)
+- **2016 Sentinel-1A Impact (700 km):** Solar array struck by a < 5 mm particle creating a ~40 cm damaged zone, causing a minor power drop without interrupting operations: [Copernicus Sentinel-1A satellite hit by space particle — ESA](https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-1/Copernicus_Sentinel-1A_satellite_hit_by_space_particle)
+- **Space Debris Size Regimes:** Objects > 10 cm are tracked by ground radar for avoidance maneuvers; objects < 1 cm cannot be tracked and require shielding (the basis for distinguishing "Orbital Congestion" vs. "Micrometeoroids / Small Debris"): public documentation by the ESA Space Debris Office.
+- **Kinetic Energy Calculation:** A 1 cm aluminum sphere (~1.4 g) impacting at 10 km/s carries $\frac{1}{2}mv^2 \approx 70\text{ kJ}$, equivalent to a 250 kg object moving at 85 km/h (direct calculation).
+- Other referenced events and failure cases (Apollo 12 lightning strike, ADEOS-II, CRS-7, AsiaSat 3, Galileo high-gain antenna) are widely documented spaceflight history.
 
-### 太空天氣（李彥宜整理）
+### Space Weather (Compiled by Yan-Yi Li)
 
-- NOAA 太空天氣分級：R3（X1 級閃焰）每個太陽週期約 175 次、R4（X10）約 8 次、R5（X20）少於 1 次；G5 極端地磁暴每週期約 4 次：[NOAA Space Weather Scales — SWPC](https://www.swpc.noaa.gov/noaa-scales-explanation)
-- 2024 年 5 月 G5 地磁暴：[“Extreme” G5 geomagnetic storm reaches Earth — CBS News](https://www.cbsnews.com/amp/texas/news/severe-geomagnetic-storm-watch-issued-unusual-solar-event)
+- **NOAA Space Weather Scales:** Per 11-year solar cycle, R3 (X1 flares) occur ~175 times, R4 (X10) ~8 times, R5 (X20) < 1 time; G5 extreme geomagnetic storms occur ~4 times per cycle: [NOAA Space Weather Scales — SWPC](https://www.swpc.noaa.gov/noaa-scales-explanation)
+- **May 2024 G5 Geomagnetic Storm:** [“Extreme” G5 geomagnetic storm reaches Earth — CBS News](https://www.cbsnews.com/amp/texas/news/severe-geomagnetic-storm-watch-issued-unusual-solar-event)
 
-> 遊戲中「太陽風暴警報」的發生頻率（LEO 約每年 0.09 次、GEO 約 0.07 次）低於真實的 G5 頻率（約每年 0.36 次）。這是為了遊戲節奏所做的簡化：只抽出「需要營運商做決定」的那部分警報。
+> In-game "Solar Storm Alert" frequencies (~0.09/yr in LEO, ~0.07/yr in GEO) are lower than the real-world G5 average (~0.36/yr). This pacing adjustment filters down to events severe enough to require active operator intervention.
 
-### 台灣太空任務（李彥宜整理）
+### Taiwan Space Missions (Compiled by Yan-Yi Li)
 
-- 福衛五號光學遙測酬載（RSI）：口徑 450 mm、720 km 太陽同步軌道、2 m 全色／4 m 多光譜、刈幅 24 km、2017 年由 Falcon 9 發射：[FORMOSAT-5 — CATALYST](https://catalyst.earth/catalyst-system-files/professional-help/references/gdb_r/Formosat-5.html)；[RSI (FORMOSAT-5) — WMO OSCAR](https://space.oscar.wmo.int/instruments/view/rsi_formosat_5)
-- 繞射極限驗算：1.22 × 550 nm × 720 km ÷ 0.45 m ≈ 1.1 m，實際 2 m 受限於偵測器像素，兩者一致（繞射極限是理論下限）
-- 福衛七號（COSMIC-2）GNSS 掩星：接收穿過大氣層而折射的導航衛星訊號，反推溫度、氣壓、濕度垂直剖面，不受雲層影響，資料用於全球數值天氣預報：[TASA](https://www.tasa.org.tw/en-US/space-knowledge/b9a512b9-deac-416b-a114-4ed87974209a)
+- **FORMOSAT-5 Remote Sensing Instrument (RSI):** 450 mm aperture, 720 km SSO, 2 m panchromatic / 4 m multispectral resolution, 24 km swath, launched on Falcon 9 in 2017: [FORMOSAT-5 — CATALYST](https://catalyst.earth/catalyst-system-files/professional-help/references/gdb_r/Formosat-5.html); [RSI (FORMOSAT-5) — WMO OSCAR](https://space.oscar.wmo.int/instruments/view/rsi_formosat_5)
+- **Diffraction Limit Verification:** $1.22 \times 550\text{ nm} \times 720\text{ km} \div 0.45\text{ m} \approx 1.1\text{ m}$; actual 2 m resolution is detector-pixel-limited, consistent with the theoretical diffraction floor.
+- **FORMOSAT-7 (COSMIC-2) GNSS Radio Occultation:** Measures refracted navigation signals passing through Earth's atmosphere to invert vertical profiles of temperature, pressure, and humidity unaffected by cloud cover, feeding global numerical weather prediction models: [TASA](https://www.tasa.org.tw/en-US/space-knowledge/b9a512b9-deac-416b-a114-4ed87974209a)
 
-### 結構材料（李彥宜整理）
+### Structural Materials (Compiled by Yan-Yi Li)
 
-- 6061-T6 降伏強度約 276 MPa、7075-T6 約 503 MPa（約 1.8 倍）：鋁合金標準材料性質
-- 立方衛星開放式框架、鋁蜂巢夾層板、一體式承力結構的取捨：依李彥宜整理的結構方案比較表
+- **6061-T6 vs. 7075-T6 Aluminum:** Yield strength ~276 MPa vs. ~503 MPa (~1.8× stronger): standard aerospace material properties.
+- **Trade-offs among CubeSat Open Frames, Aluminum Honeycomb Sandwich Panels, and Monolithic Load-Bearing Structures:** Based on structural comparison tables compiled by Yan-Yi Li.
 
-### 姿態控制（梁詠為整理）
+### Attitude Control (Compiled by Yong-Wei Liang)
 
-- 地球磁場近似偶極場，強度 ∝ 1/r³：(42,157 km ÷ 6,921 km)³ ≈ 226，直接計算
-- NASA FASTSAT-HSV01（約 180 kg）僅用三根互相垂直的磁力棒控制姿態：Design and Integration of an All-Magnetic Attitude Control System for FASTSAT-HSV01's Multiple Pointing Objectives（梁詠為提供）
-- 韋伯太空望遠鏡 6 顆反應輪，單顆 6,000 rpm 時角動量 68 N·m·s：The Design, Verification, and Performance of the James Webb Space[The Design, Verification and Performance of the James Webb Space Telescope](https://ntrs.nasa.gov/citations/20230009106)
-- 克卜勒太空望遠鏡 4 顆反應輪、需要 3 顆才能精確指向，2013 年第二顆失效後改為 K2 任務：廣為記載
-- 哈伯 2021 年 6 月酬載電腦故障，安全模式約一個月後切換到備援硬體恢復：NASA 公開新聞
-- 遊戲中的指向精度（磁力棒 2°、反應輪 0.02°）與各任務的指向需求為**遊戲估算值**，量級符合小衛星磁力棒控制（數度）與星象儀＋反應輪（百分之一度級）的典型表現
+- **Dipole Geomagnetic Field Scaling ($\propto 1/r^3$):** $(42,157\text{ km} \div 6,921\text{ km})^3 \approx 226$ (direct calculation).
+- **NASA FASTSAT-HSV01 (~180 kg):** Controlled exclusively using three orthogonal magnetorquers: *Design and Integration of an All-Magnetic Attitude Control System for FASTSAT-HSV01's Multiple Pointing Objectives* (provided by Yong-Wei Liang).
+- **James Webb Space Telescope Reaction Wheels:** 6 reaction wheels, each delivering 68 N·m·s angular momentum at 6,000 rpm: [The Design, Verification, and Performance of the James Webb Space Telescope](https://ntrs.nasa.gov/citations/20230009106)
+- **Kepler Space Telescope:** 4 reaction wheels (3 required for fine pointing); transitioned to K2 mission after losing a second wheel in 2013 (widely documented).
+- **Hubble June 2021 Payload Computer Anomaly:** Entered safe mode for ~1 month before switching to redundant backup hardware (NASA press releases).
+- In-game pointing accuracies (2° for magnetorquers, 0.02° for reaction wheels) and mission pointing requirements are **game estimates**, scaled realistically to match SmallSat magnetic control (a few degrees) versus star tracker + reaction wheel precision (hundredths of a degree).
 
-### 熱控（梁詠為整理）
+### Thermal Control (Compiled by Yong-Wei Liang)
 
-- 散熱面輻射：史蒂芬－波茲曼定律，ε = 0.85、20°C 時 εσT⁴ ≈ 355 W/m²；扣掉地球紅外線與反照後的淨散熱量（LEO 250、GEO 330 W/m²）為**遊戲估算值**
-- 福衛五號太陽能板背部散熱面：[Solar Panel Temperature Reduction Study of FORMOSAT-5 Satellite](https://www.airitilibrary.com/Article/Detail/19907710-201106-201108030008-201108030008-111-117)
-- 迴路熱管：[Propylene Loop Heat Pipe Design and Thermal Performance](https://tfaws.nasa.gov/wp-content/uploads/TFAWS23-PT-19-Paper.pdf)（NASA PACE）；大型通訊衛星使用熱管與可展開散熱板為業界常識
-- 衛星熱控綜述：[Advances in satellite thermal management systems: Challenges, innovations, and future directions](https://www.sciencedirect.com/science/article/pii/S0094576526000883)
+- **Radiative Heat Rejection:** Stefan–Boltzmann law ($\varepsilon\sigma T^4 \approx 355\text{ W/m}^2$ at $\varepsilon = 0.85$ and $20^\circ\text{C}$); net rejection figures accounting for Earth IR and albedo (250 W/m² in LEO, 330 W/m² in GEO) are **game estimates**.
+- **FORMOSAT-5 Rear Solar Panel Radiator:** [Solar Panel Temperature Reduction Study of FORMOSAT-5 Satellite](https://www.airitilibrary.com/Article/Detail/19907710-201106-201108030008-201108030008-111-117)
+- **Loop Heat Pipes:** [Propylene Loop Heat Pipe Design and Thermal Performance](https://tfaws.nasa.gov/wp-content/uploads/TFAWS23-PT-19-Paper.pdf) (NASA PACE); use of heat pipes and deployable radiators on large communications satellites is standard aerospace practice.
+- **Satellite Thermal Control Review:** [Advances in satellite thermal management systems: Challenges, innovations, and future directions](https://www.sciencedirect.com/science/article/pii/S0094576526000883)
 
-### 運作期軌道畫面的地球
+### Operations Orbit View Earth Rendering
 
-- 海岸線與冰原：[Natural Earth](https://www.naturalearthdata.com/) 1:110m `ne_110m_land`、`ne_110m_glaciated_areas`（公有領域），以 `tools/earth-texture.py` 轉成 192×48 的北半球像素地圖
-- 北極海冰：每年 3 月最大約 1,400–1,500 萬 km²、9 月最小約 400 萬 km²（[NSIDC Arctic Sea Ice News](https://nsidc.org/arcticseaicenews/)）。遊戲以北緯 77° 以北的海面當作年平均範圍，為**遊戲估算值**。Google Earth 的底圖是拼接的無雲影像加海底地形渲染，不顯示會漂移的海冰；當天真實影像可在 [NASA Worldview](https://worldview.earthdata.nasa.gov/) 查看
-- 太陽同步軌道：550 km 高度傾角約 97.6°；地球觀測衛星常用上午 10:30 降交點
-- 地面站：國家太空中心（新竹，北緯 24.8°、東經 121.0°）。550 km 衛星的地面可視範圍約為 acos(R⊕/r) ≈ 22.6°，所以赤道軌道的低軌衛星永遠不會出現在台灣的地平線上，必須用傾斜軌道
+- **Coastlines & Ice Sheets:** [Natural Earth](https://www.naturalearthdata.com/) 1:110m `ne_110m_land` and `ne_110m_glaciated_areas` (public domain), converted into a 192×48 Northern Hemisphere pixel map via `tools/earth-texture.py`.
+- **Arctic Sea Ice Extent:** Annual maximum ~14–15 million km² in March, minimum ~4 million km² in September ([NSIDC Arctic Sea Ice News](https://nsidc.org/arcticseaicenews/)). The game approximates annual mean ice cover as ocean north of 77°N (**game estimate**). Google Earth uses cloud-free stitched imagery with bathymetric shading and omits drifting sea ice; daily true-color imagery is viewable on [NASA Worldview](https://worldview.earthdata.nasa.gov/).
+- **Sun-Synchronous Orbit (SSO):** ~97.6° inclination at 550 km altitude; Earth observation satellites commonly use a 10:30 AM descending node.
+- **Ground Station:** Taiwan Space Agency (TASA) in Hsinchu (24.8°N, 121.0°E). A satellite at 550 km has a ground visibility horizon radius of $\arccos(R_\oplus / r) \approx 22.6^\circ$, meaning an equatorial LEO satellite never rises above Taiwan's horizon—necessitating an inclined orbit.
 
-### PSLV 與電離層任務
+### PSLV & Ionosphere Probe Mission
 
-- PSLV-XL：1,750 kg 到 620 km SSO、1,425 kg 到次同步轉移軌道（284 × 20,650 km）：[Polar Satellite Launch Vehicle — Wikipedia](https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle)。價格約 ₹130–200 crore（約 $16–29M），NSIL 沒有公布官方報價，**遊戲取 $25M**
-- PSLV 飛行紀錄：PSLV-C62（2026 年 1 月 12 日）是第 64 次發射，第三節異常導致失敗；前一次 PSLV-C61（2025 年 5 月）同樣失敗：[PSLV-C62 / EOS-N1 Mission — ISRO](https://www.isro.gov.in/Mission_PSLV_C62.html)；[ISRO's first 2026 mission PSLV-C62 fails — Deccan Herald](https://www.deccanherald.com/science/space/isros-first-2026-mission-pslv-c62-fails-3859678)。失敗共 4 次（1993、2017、2025、2026）加 1 次部分失敗（1997），遊戲記為 64 次中 59 次成功。截至 2026 年 10 月，下一次發射（C63）尚未進行
-- 次同步轉移軌道多出的 Δv：從 284 × 20,650 km、傾角 17.9°（GSAT-12 的實際軌道）圓化成 GEO 約需 1.99 km/s，比卡納維爾角 GTO 的 1.83 km/s 多約 0.16 km/s，由霍曼轉移與遠地點變軌公式直接計算
-- 考慮過但沒採用的 Firefly Alpha：7 次發射、3 次成功、2 次失敗、2 次部分失敗：[Firefly Alpha — Wikipedia](https://en.wikipedia.org/wiki/Firefly_Alpha)；[Firefly Alpha FLTA007 launches successfully — NASASpaceFlight](https://www.nasaspaceflight.com/2026/03/firefly-flta007-launch/)
-- Electron 第 13 次發射（2020 年 7 月）因第二節電路接點故障失敗、損失 7 顆衛星：廣為記載
-- 福衛五號 AIP：感測頭 0.58 kg＋支架 0.92 kg＋電子箱約 2 kg＋線束約 1 kg、平均約 4.7 W；量測離子成分、總離子濃度、兩個方向的離子速度、離子與電子溫度；4 種模式（PLP、RPA、IT、IDM）：[FormoSat-5 — eoPortal](https://www.eoportal.org/satellite-missions/formosat-5)
-- 福衛七號 TGRS：約 6 kg、50 W，每天超過 4,000 筆掩星剖面；衛星濕重約 278 kg：[FormoSat-7 / COSMIC-2 — eoPortal](https://www.eoportal.org/satellite-missions/stp2-formosat-7)
-- 福衛五號 720 km 太陽同步軌道、上午／晚上 10:30 地方時；福衛七號 24° 傾角、6 顆衛星：同上兩個 eoPortal 頁面
-- NASA GOLD 從 GEO（SES-14）以遠紫外光觀測高層大氣：廣為記載，用來說明「遙測」與「實地量測」的差別
-- 電推進器功率調節：NSTAR 可在 0.5–2.3 kW 之間運轉：[NSTAR — Astronautix](http://www.astronautix.com/n/nstar.html)。遊戲取「低於額定的 1/4 就點不著」為**遊戲估算值**
-- 整流罩約在 110 km 高度分離（自由分子流加熱降到可接受範圍）、PSLV-XL 有 6 具固體捆綁助推器（其中 2 具空中點火）、Falcon Heavy 2018 年首飛兩支側推進器同時著陸：廣為記載的發射流程
+- **PSLV-XL:** 1,750 kg to 620 km SSO, 1,425 kg to Sub-GTO (284 × 20,650 km): [Polar Satellite Launch Vehicle — Wikipedia](https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle). Estimated cost ₹130–200 crore (~$16–29M); NSIL does not publish list prices, so **the game uses $25M**.
+- **PSLV Flight Heritage:** PSLV-C62 (January 12, 2026) was its 64th launch and failed due to a third-stage anomaly, following a prior failure on PSLV-C61 (May 2025): [PSLV-C62 / EOS-N1 Mission — ISRO](https://www.isro.gov.in/Mission_PSLV_C62.html); [ISRO's first 2026 mission PSLV-C62 fails — Deccan Herald](https://www.deccanherald.com/science/space/isros-first-2026-mission-pslv-c62-fails-3859678). Accounting for 4 failures (1993, 2017, 2025, 2026) and 1 partial failure (1997), the game records 59 successes out of 64 launches. As of October 2026, the next mission (C63) had not yet launched.
+- **Sub-GTO Δv Penalty:** Circularizing from 284 × 20,650 km at 17.9° inclination (GSAT-12's actual transfer orbit) into GEO requires ~1.99 km/s—roughly 0.16 km/s more than the 1.83 km/s from a Cape Canaveral GTO, computed directly via Hohmann transfer and apogee plane-change equations.
+- **Evaluated but Rejected — Firefly Alpha:** 7 launches, 3 successes, 2 failures, 2 partial failures: [Firefly Alpha — Wikipedia](https://en.wikipedia.org/wiki/Firefly_Alpha); [Firefly Alpha FLTA007 launches successfully — NASASpaceFlight](https://www.nasaspaceflight.com/2026/03/firefly-flta007-launch/).
+- **Electron Flight 13 Failure (July 2020):** Failed due to an electrical connection fault on Stage 2, losing 7 satellites (widely documented).
+- **FORMOSAT-5 AIP (Advanced Ionospheric Probe):** Sensor head 0.58 kg + boom 0.92 kg + electronics box ~2 kg + harness ~1 kg, ~4.7 W average power; measures ion composition, total ion density, 2-axis ion velocity, and ion/electron temperatures across 4 modes (PLP, RPA, IT, IDM): [FormoSat-5 — eoPortal](https://www.eoportal.org/satellite-missions/formosat-5).
+- **FORMOSAT-7 TGRS (TriG GNSS-RO Receiver):** ~6 kg, 50 W, > 4,000 occultation profiles/day; satellite wet mass ~278 kg: [FormoSat-7 / COSMIC-2 — eoPortal](https://www.eoportal.org/satellite-missions/stp2-formosat-7).
+- **Orbital Parameters:** FORMOSAT-5 operates in a 720 km SSO (10:30 AM/PM local time); FORMOSAT-7 operates 6 satellites at 24° inclination (same eoPortal sources).
+- **NASA GOLD:** Observes the upper atmosphere in far-ultraviolet from GEO (hosted on SES-14), cited to illustrate remote sensing vs. *in situ* plasma measurements.
+- **Electric Thruster Throttling:** NSTAR operates across 0.5–2.3 kW: [NSTAR — Astronautix](http://www.astronautix.com/n/nstar.html). The game's "fails to ignite below 1/4 rated power" cutoff is a **game estimate**.
+- **Launch Event Milestones:** Payload fairing jettison at ~110 km altitude (where free-molecular heating drops to acceptable levels), PSLV-XL's 6 solid strap-on boosters (2 air-lit), and Falcon Heavy's simultaneous dual side-booster landings on its 2018 maiden flight: standard launch vehicle documentation.
+- **Solar Array Specific Power:** ROSA delivers ~3× the specific power of rigid panels (see Redwire source above). In-game system specific powers (including batteries and power control)—25 W/kg for body-mounted, 35 W/kg for deployable, 70 W/kg for ROSA—along with per-kW costs and the 300 W cap on body-mounted cells are **game estimates**.
+- **ViaSat-1 Launch Mass:** Launched on Proton in 2011 (~140 Gbps) at ~6.7 metric tons (public data), used to set the high-throughput transponder payload mass at 2,200 kg.
+- Hall thruster and NSTAR power consumption figures are cited under "Propulsion Systems" above.
 
-- ROSA 的每公斤功率約為傳統硬式太陽能板的 3 倍（見上方 Redwire 資料）。遊戲的系統比功率（含電池與電源控制）：機身貼附式 25 W/kg、展開式 35 W/kg、ROSA 70 W/kg，以及每 kW 成本與機身貼附式的 300 W 上限，皆為**遊戲估算值**
-- ViaSat-1（2011 年由 Proton 發射，約 140 Gbps）發射質量約 6.7 噸：一般公開資料。遊戲據此把高通量轉發器酬載設為 2,200 kg
-- 霍爾推進器、NSTAR 的耗電見上方「推進系統」
+> Plasma instrument costs, daily data volumes, Langmuir probe mass/power, the "7-parameter" scoring formula, and the Ionosphere mission budget are **game estimates**.
 
-> 電漿儀器的成本、每日資料量、朗繆爾探針的質量與耗電、「7 項參數」的計分方式，以及電離層任務的預算，皆為**遊戲估算值**。
+### Flight Computers (Compiled in "rocket game Computer selection", Added 2026-11-09)
 
-### 衛星電腦（組員整理「rocket game Computer selection」，2026-11-09 加入遊戲）
+Team members compared five real-world spaceflight computers (sourced from manufacturer datasheets, SatCatalog, and satsearch):
 
-組員比較了五款真實的衛星電腦（資料來源為各廠商規格頁、SatCatalog、satsearch）：
-
-| 型號 | 功耗 | 耐久 | 重量 | 價格 | 遊戲裡的位置 |
+| Model | Power | Durability / Radiation | Mass | Price | In-Game Role |
 |---|---|---|---|---|---|
-| GomSpace NanoMind A3200 | 0.17–0.9 W | −30～+85 °C，有飛行實績，商用零件、未公布 TID | 24 g | 未公開 | 「輕量商規」等級的原型 |
-| ISISPACE iOBC | 典型 0.40 W，最大約 0.55 W | 2012–2014 年起有飛行實績，−25～+65 °C，無正式 TID 規格 | 94 g | 約 US$5,200–8,090（SatCatalog，2021 會計年度） | 只放圖鑑 |
-| AAC Clyde Space Kryten-M3 | 典型 0.40 W，最大 1 W | TID 20 krad，LEO 設計壽命 5 年，SEL 保護與 EDAC，−40～+80 °C；Cortex-M3 50 MHz | 61.9 g | 未公開 | 只放圖鑑 |
-| EnduroSat OBC | 公開頁只標「低功耗」 | TID 40 krad，LEO 約 5 年，TRL 9；32 GB 級儲存、ECC FRAM、可選 GNSS | 123 g（含 GNSS 173 g） | 牌價 US$12,400 | 「大容量」等級的原型 |
-| BAE RAD750 3U CompactPCI | 小於 10.8 W（132 MHz 約 11 W、198 MHz 約 12.2 W） | 板級 TID 大於 100 krad，處理器 200 krad～約 1 Mrad，閂鎖免疫；火星車與深空任務實績；時脈約 200 MHz | 549 g | 單顆處理器常見引用超過 US$200,000 | 「抗輻射」等級的原型（雙機備份） |
+| GomSpace NanoMind A3200 | 0.17–0.9 W | −30 to +85 °C, flight heritage, COTS components, no published TID | 24 g | Undisclosed | Prototype for "Lightweight COTS" tier |
+| ISISPACE iOBC | 0.40 W typical, ~0.55 W max | Flight heritage since 2012–2014, −25 to +65 °C, no formal TID spec | 94 g | ~US$5,200–8,090 (SatCatalog, FY2021) | Space Codex entry only |
+| AAC Clyde Space Kryten-M3 | 0.40 W typical, 1 W max | 20 krad TID, 5-yr LEO design life, SEL protection & EDAC, −40 to +80 °C; Cortex-M3 50 MHz | 61.9 g | Undisclosed | Space Codex entry only |
+| EnduroSat OBC | Listed as "Low power" on public page | 40 krad TID, ~5-yr LEO, TRL 9; 32 GB-class storage, ECC FRAM, optional GNSS | 123 g (173 g with GNSS) | US$12,400 list price | Prototype for "High-Capacity" tier |
+| BAE RAD750 3U CompactPCI | < 10.8 W (~11 W at 132 MHz, ~12.2 W at 198 MHz) | > 100 krad board-level TID, 200 krad–1 Mrad processor TID, latch-up immune; Mars rover & deep-space heritage; ~200 MHz clock | 549 g | Commonly cited at > US$200,000 per processor | Prototype for "Radiation-Hardened" tier (dual-redundant) |
 
-> 遊戲裡的衛星電腦代表整套指令與資料處理系統（電腦板＋固態記錄器＋線束＋飛行軟體開發驗證），所以三個等級的質量（0.5／2／10 kg）、功耗（1／5／25 W）、成本（$0.3M／$1.5M／$8M）、每日資料處理量（100／4,000／1,000 Gbit），以及「標準電腦已含在原本的衛星本體數值裡」的拆分方式，皆為**遊戲估算值**。
+> In-game flight computers represent the entire Command & Data Handling (C&DH) subsystem (processor board + solid-state recorder + harness + flight software V&V). Consequently, the three tiers' masses (0.5 / 2 / 10 kg), power draws (1 / 5 / 25 W), costs ($0.3M / $1.5M / $8M), daily data throughput limits (100 / 4,000 / 1,000 Gbit), and the accounting split where "Standard computer specs are factored out of the baseline spacecraft bus" are **game estimates**.
 
+### Font & Art Asset Licenses
 
-### 字型與美術素材授權
+- **Cubic 11 (俐方體11號):** [ACh-K/Cubic-11 — GitHub](https://github.com/ACh-K/Cubic-11), licensed under SIL Open Font License 1.1, loaded via jsDelivr pinned at v1.500.
+- **Noto Sans TC:** Google Fonts, licensed under SIL Open Font License 1.1.
+- All in-game pixel icons, panel frames, starfield backgrounds, launchpad graphics, components, and rocket sprites are procedurally generated via Python scripts in this repository (`tools/` directory); `image/Stars/Saturn.png` was contributed by a team member.
 
-- 俐方體11號（Cubic 11）：[ACh-K/Cubic-11 — GitHub](https://github.com/ACh-K/Cubic-11)，SIL Open Font License 1.1，網頁從 jsDelivr 載入 v1.500
-- Noto Sans TC：Google Fonts，SIL Open Font License 1.1
-- 遊戲內所有像素圖示、面板外框、星空背景、發射場、零件與火箭圖皆由本專案的 Python 腳本程式生成（`tools/` 資料夾）；`image/Stars/Saturn.png` 為組員提供
+## Space History Behind Each Achievement
 
-## 成就對應的太空史料
-
-### 🏆 首次入軌成功 — 阿波羅 11 號
+### 🏆 First Orbit — Apollo 11
 - [Apollo 11 Mission Overview — NASA](https://www.nasa.gov/history/apollo-11-mission-overview/)
 - [Apollo 11 — NASA](https://www.nasa.gov/mission/apollo-11/)
 - [July 20, 1969: One Giant Leap For Mankind — NASA](https://www.nasa.gov/history/july-20-1969-one-giant-leap-for-mankind/)
 
-### 💰 精打細算 — 曼加里安號（印度火星軌道探測器）
+### 💰 Under Budget — Mangalyaan (Mars Orbiter Mission)
 - [India's $74 million Mars mission cost less than 'Gravity' movie — CNN](https://www.cnn.com/2014/09/25/news/india-mars-cost)
 - [Mars Orbiter Mission — Wikipedia](https://en.wikipedia.org/wiki/Mars_Orbiter_Mission)
 
-> 非 NASA 資源——這是印度太空研究組織（ISRO）的任務，故事重點是「用極低成本首次嘗試就成功」。
+> Non-NASA resource — an Indian Space Research Organisation (ISRO) mission highlighting "succeeding on the first attempt on a shoestring budget."
 
-### 🛡️ 力抗風暴 — 1972 年 8 月太陽風暴
+### 🛡️ Storm Survivor — August 1972 Solar Storm
 - [NASA Space Weather Living History — 1972](https://spaceweatherlivinghistory.org/timeline/31/)
 - [How NASA Will Protect Astronauts From Space Radiation — NASA Goddard](https://svs.gsfc.nasa.gov/13275)
 
-> 這場風暴發生在阿波羅 16 號（1972 年 4 月返航）與阿波羅 17 號（1972 年 12 月發射）之間，若時程稍有變動，當時在月表的太空人可能會受到足以致命的輻射劑量。
+> Occurred between Apollo 16 (returned April 1972) and Apollo 17 (launched December 1972); had mission schedules shifted slightly, astronauts on the lunar surface could have absorbed lethal radiation doses.
 
-### ⭐ 全能設計 — 航海家一號、二號
+### ⭐ All-Rounder — Voyager 1 & Voyager 2
 - [Voyager — NASA JPL Mission Overview](https://voyager.jpl.nasa.gov/mission/)
 - [Voyager 1: The Farthest Spacecraft — NASA Science](https://science.nasa.gov/mission/voyager/voyager-1/)
 - [Interstellar Mission — NASA Science](https://science.nasa.gov/mission/voyager/interstellar-mission/)
 
-> 航海家二號是唯一飛越天王星與海王星的探測器；航海家一號只飛到土星後轉向星際空間。故事文字已依此修正，避免誤植成兩艘都飛越了天王海王星。
+> Voyager 2 is the only spacecraft to have visited Uranus and Neptune; Voyager 1 flew past Saturn and headed directly toward interstellar space. In-game flavor text was corrected accordingly to avoid implying both probes visited Uranus and Neptune.
 
-### 💥 雖敗猶榮 — 弗拉基米爾・科馬洛夫與聯合號一號
+### 💥 Glorious Failure — Vladimir Komarov & Soyuz 1
 - [Vladimir Komarov — Wikipedia](https://en.wikipedia.org/wiki/Vladimir_Komarov)
 - [The First Fatal Spaceflight — Smithsonian Magazine](https://www.smithsonianmag.com/air-space-magazine/first-fatal-spaceflight-180963019/)
 
-> 非 NASA 資源（蘇聯任務）。1967 年 4 月 23 日發射，4 月 24 日返航時因降落傘故障罹難，是第一位在實際太空飛行任務中犧牲的太空人。遊戲內文字刻意採取較嚴肅、致敬的語氣。
+> Non-NASA resource (Soviet mission). Launched April 23, 1967, and perished during re-entry on April 24 due to a parachute failure—becoming the first human fatality during a spaceflight. In-game text intentionally adopts a solemn, respectful tone.
 
-### 🔁 屢敗屢戰 — SpaceX 獵鷹一號
+### 🔁 Never Give Up — SpaceX Falcon 1
 - [Falcon 1 — Wikipedia](https://en.wikipedia.org/wiki/Falcon_1)
 - [SpaceX Successfully Launches Falcon 1 Rocket Into Orbit — Space.com](https://www.space.com/5905-spacex-successfully-launches-falcon-1-rocket-orbit.html)
 
-> 非 NASA 資源（民營公司）。前三次發射（2006、2007、2008 年多次）皆失敗，2008 年 9 月第四次終於成功入軌，是 SpaceX 差點破產前的關鍵一役。
+> Non-NASA resource (private aerospace). After three consecutive launch failures (2006–2008), Falcon 1 reached orbit on its fourth flight in September 2008—saving SpaceX from near-bankruptcy.
 
-### 🛠️ 克難精神 — 史普尼克一號
+### 🛠️ Bare Bones — Sputnik 1
 - [Dawn of the Space Age — NASA](https://www.nasa.gov/history/dawn-of-the-space-age/)
 - [Sputnik and the Origins of the Space Age — NASA History Office](https://www.nasa.gov/history/sputnik/sputorig.html)
 
-> 非 NASA 任務（蘇聯），但引用的是 NASA 歷史辦公室（NASA History Office）的回顧資料。
+> Non-NASA mission (Soviet), citing historical retrospectives from the NASA History Office.
 
-### 💎 不計成本 — 詹姆斯・韋伯太空望遠鏡
+### 💎 Top of the Line — James Webb Space Telescope (JWST)
 - [How much did NASA's James Webb Space Telescope cost? — USAFacts](https://usafacts.org/articles/how-much-did-nasas-james-webb-space-telescope-cost/)
 - [How much does the James Webb Space Telescope cost? — The Planetary Society](https://www.planetary.org/articles/cost-of-the-jwst)
 
-> NASA 官方數字約為 97 億美元（含開發與初期運作），媒體常概略稱為「百億美元望遠鏡」，遊戲文字採用後者的通俗說法。
+> Official NASA lifecycle cost is ~$9.7 billion (development plus initial operations), commonly rounded in media coverage to the "$10 billion telescope," which the in-game text adopts.
 
-### 💔 功虧一簣 — 火星氣候探測者號
+### 💔 So Close — Mars Climate Orbiter
 - [Mars Climate Orbiter — NASA JPL](https://www.jpl.nasa.gov/missions/mars-climate-orbiter/)
 - [Mars Climate Orbiter Mishap — NASA Safety Center](https://sma.nasa.gov/news/safety-messages/safety-message-item/lost-in-translation)
 
-> 1999 年因地面團隊一方用公制、一方用英制單位計算推力數據，探測器以錯誤高度進入火星大氣層解體，是工程界最經典的「單位換算」警世案例。
+> Lost in 1999 when one ground team calculated thruster impulse in metric units (newton-seconds) while another used imperial units (pound-force seconds), causing the probe to enter Mars' atmosphere too low and disintegrate—a classic engineering cautionary tale on unit conversion.
 
-### 🧯 危機處理 — 阿波羅 13 號
+### 🧯 Crisis Management — Apollo 13
 - [NASA Commemorates 50th Anniversary of Apollo 13, 'A Successful Failure' — NASA](https://www.nasa.gov/news-release/nasa-commemorates-50th-anniversary-of-apollo-13-a-successful-failure/)
 
-### 🎯 完美無瑕 — 毅力號「恐怖七分鐘」
+### 🎯 Flawless Mission — Perseverance's "Seven Minutes of Terror"
 - [7 Minutes to Mars: NASA's Perseverance Rover Attempts Most Dangerous Landing Yet — NASA JPL](https://www.jpl.nasa.gov/videos/7-minutes-to-mars-nasas-perseverance-rover-attempts-most-dangerous-landing-yet/)
 - [Perseverance Team Overcomes Seven Minutes of Terror — NASA APPEL](https://appel.nasa.gov/2021/02/23/perseverance-team-overcomes-seven-minutes-of-terror/)
 
-### 👑 太空全才
-無對應單一真實事件，是遊戲原創的隱藏總成就（集滿其餘 11 個成就解鎖），文字為統整性的致敬語，不引用特定資料來源。
+### 👑 Space Polymath
+Does not correspond to a single historical event; it is an original hidden meta-achievement unlocked by earning all other 11 achievements, featuring a unifying congratulatory message without external citations.
