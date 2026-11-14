@@ -82,7 +82,7 @@
 - 1 cm 鋁珠（約 1.4 g）以 10 km/s 撞擊的動能 ½mv² ≈ 70 kJ，等於 250 kg 物體以 85 km/h 運動：直接計算
 - 其他事件與失敗原因引用的史實（Apollo 12 閃電、ADEOS-II、CRS-7、AsiaSat 3、伽利略號天線）均為廣為記載的太空史事件
 
-### 太空天氣（李彥宜整理，2026-10-11 查證）
+### 太空天氣（李彥宜整理）
 
 - NOAA 太空天氣分級：R3（X1 級閃焰）每個太陽週期約 175 次、R4（X10）約 8 次、R5（X20）少於 1 次；G5 極端地磁暴每週期約 4 次：[NOAA Space Weather Scales — SWPC](https://www.swpc.noaa.gov/noaa-scales-explanation)
 - 2024 年 5 月 G5 地磁暴：[“Extreme” G5 geomagnetic storm reaches Earth — CBS News](https://www.cbsnews.com/amp/texas/news/severe-geomagnetic-storm-watch-issued-unusual-solar-event)
