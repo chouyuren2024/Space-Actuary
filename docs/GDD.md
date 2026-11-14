@@ -1,186 +1,184 @@
-# Game Design Document — 太空精算師 Space Actuary
+# Game Design Document — Space Actuary
 
-正式遊戲名稱：**太空精算師**（英文：Space Actuary）。「精算師」呼應遊戲核心——在預算、質量、可靠度之間精算取捨。
+Official Game Title: **太空精算師** (English: **Space Actuary**). The word "Actuary" reflects the core gameplay loop—calculating and balancing trade-offs across budget, mass, and reliability.
 
-## 1. 挑戰背景
+## 1. Challenge Background
 
-參賽項目：[NASA Space Apps Challenge 2026 — Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/)
+Competition Entry: [NASA Space Apps Challenge 2026 — Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/)
 
-官方摘要（節錄）：設計太空任務需要在任務目標、太空船設計、科學儀器、發射載具、預算、功率、質量、通訊、軌道限制之間做取捨。挑戰要求做出一款互動遊戲，讓玩家從概念到運作體驗完整任務決策，管理有限資源，並看到每個選擇如何影響任務成敗。
+Official Summary (Excerpt): Designing a space mission requires making trade-offs among mission objectives, spacecraft design, scientific instruments, launch vehicles, budget, power, mass, communications, and orbital constraints. The challenge calls for an interactive game where players experience end-to-end mission decision-making from concept to operations, manage limited resources, and see how every choice impacts mission success or failure.
 
-難度標記為 Intermediate，但同時涵蓋 Beginner/Youth，代表遊戲需要對新手友善、易懂，同時仍保有真實的取捨張力。
+## v2 Overhaul: Realistic Mission Model
 
-## v2 改版：真實任務模型
+> This section supersedes the abstract numerical designs in Sections 3–8 and Section 12 below (retained as historical record). All real-world figures and sources are documented in `docs/REFERENCES.md`, with code implementation in `js/data.js` (parameters) and `js/mission.js` (calculations).
 
-> 本節取代下方第 3–8 節與第 12 節的抽象數值設計（保留作為歷史紀錄）。所有真實數據與來源見 `docs/REFERENCES.md`，程式實作在 `js/data.js`（數值）與 `js/mission.js`（計算）。
+**Reason for Overhaul:** Exhaustive enumeration of 6,200 configurations in v1 revealed several flaws: science payloads had zero impact on mission success (all top 50 optimal builds chose the economy tier), there was only a single optimal solution, mass limits barely mattered, probabilities were completely hidden, and even the best build only achieved a 69.6% success rate. v2 is guided by two principles: **adhere to real space science** and **ensure players learn real space engineering by playing**.
 
-**改版原因**：v1 窮舉 6,200 種配置後發現——科學酬載對成敗零影響（最佳前 50 名全選經濟檔）、最佳解唯一、質量限制幾乎不起作用、機率完全隱藏、最佳解也只有 69.6% 成功率。v2 的兩個原則：**遵守真實太空科學**、**玩完要對太空工程有所了解**。
+**Core Objective:** Maximize "Expected Mission Value" = Mission Value × Probability of Success—the exact job of an actuary.
 
-**核心目標**：讓「期望任務價值」最大化 = 任務價值 × 成功機率——這正是「精算師」的工作。
+**Mission Value** = Coverage × Performance × Data Downlink × Power × Lifespan (each 0–100%):
+- **Coverage:** Determined by orbital geometry (GEO only sees 42% of Earth and cannot view polar regions; a single LEO satellite passes overhead for only ~35 minutes per day; typhoon tracking requires an image every 10 minutes).
+- **Performance:** Optical payloads calculate ground resolution via the diffraction limit ($1.22\lambda h / D$) and spectral band count; communications payloads are measured by transponder capacity.
+- **Data Downlink:** (Downlink rate × daily contact duration [~36 min/day for LEO; 24 hours for GEO, but signal strength is ~4,200× weaker]) ÷ daily payload data generated.
+- **Power:** Available solar array power (LEO × 0.62 due to Earth eclipse; GEO × 0.85 due to 15-year degradation) ÷ power consumption.
+- **Lifespan:** Proportion of design life sustainable by the Δv calculated via the Tsiolkovsky rocket equation; electric propulsion takes ~6 months to spiral out to GEO, delaying service entry.
 
-**任務價值** = 覆蓋 × 性能 × 資料下傳 × 電力 × 壽命（各 0–100%）：
-- 覆蓋：由軌道幾何決定（GEO 只看得到 42% 的地球且看不到極區；單顆 LEO 衛星每天只在頭頂約 35 分鐘；颱風追蹤需要每 10 分鐘一張）
-- 性能：光學酬載用繞射極限算地面解析度（1.22λh/D）與光譜波段數；通訊酬載用轉發器容量
-- 資料下傳：下傳速率 × 每日通訊時間（LEO 約 36 分鐘；GEO 24 小時但訊號弱約 4,200 倍）÷ 酬載每日產生的資料量
-- 電力：太陽能板可用功率（LEO × 0.62 因地球陰影；GEO × 0.85 因 15 年衰退）÷ 用電
-- 壽命：火箭方程式算出的 Δv 能撐完設計壽命的比例；電推進到 GEO 要約 6 個月，延後服務
+**Probability of Success:**
+- **Launch:** Rocket flight heritage estimated using Laplace's rule of succession × structural survival against launch vibration loads.
+- **Deployment:** 99% reliability per deployable mechanism.
+- **Operations:** Component tier (COTS / Space-grade / Redundant) determines annual failure rate, multiplied by orbital radiation, structural shielding, and event modifiers. Operational failures result in "Partial Success," delivering prorated value based on active operational years.
 
-**成功機率**：
-- 發射：火箭飛行紀錄用拉普拉斯接續法則估計 × 結構撐過發射振動
-- 展開：每個展開機構 99%
-- 運作：零件等級（商規／太空級／冗餘）決定年故障率，乘上軌道輻射、結構屏蔽、事件影響；運作期故障為「部分成功」，依運作年數交付部分價值
+**Hard Constraints** (prevent launch): Exceeding budget, exceeding rocket payload capacity to the target orbit, or selecting a rocket incapable of reaching the target orbit (e.g., Electron cannot reach GTO). All other parameters are soft constraints that penalize mission value or reliability—reinforcing the "learn from failure" philosophy.
 
-**硬限制**（無法發射）：超出預算、超過火箭到該軌道的運力、火箭到不了該軌道（Electron 無法到 GTO）。其餘一律是軟限制，影響價值或機率——延續「從錯誤中學習」原則。
+**No Hardcoded Orbital Rules:** Orbital suitability emerges naturally from physics. Exhaustive enumeration confirms that Imaging/Climate missions perform best in LEO, while Typhoon/Comms missions perform best in GEO; choosing the suboptimal orbit still yields partial value (e.g., Climate in GEO yields ~36%).
 
-**軌道正確性不再寫死規則**：由物理自然浮現。窮舉驗證：影像／氣候任務在 LEO 最佳，颱風／通訊任務在 GEO 最佳；選錯軌道仍有部分價值（例如氣候任務選 GEO 約 36%）。
+**Mission Objectives** (4 original types, each modeled on real missions): High-Resolution Imaging (WorldView-3), Global Climate Monitoring (Terra/MODIS), Real-Time Typhoon Tracking (GOES / Himawari), and Broadband Communications (ViaSat / Intelsat). A 5th objective was added on 2026-10-12: Ionosphere Probe (FORMOSAT-5 AIP / FORMOSAT-7), detailed in "Playtest Feedback Overhaul" below.
 
-**任務目標**（4 種，各對應真實任務）：高解析度影像（WorldView-3）、全球氣候監測（Terra/MODIS）、颱風即時追蹤（GOES／向日葵）、通訊廣播（ViaSat／Intelsat）。2026-10-12 新增第 5 種：電離層探測（福衛五號 AIP／福衛七號），見文末「組員試玩回饋改版」。
+**Propulsion Systems:** Hydrazine, AF-M315E, MMH/NTO Bipropellant (replacing hydrogen peroxide, as MMH/NTO is standard for GEO apogee engines), Hall-Effect Thruster, and Gridded Ion Thruster. Propellant load is set via a kg slider with real-time Δv readout, alongside an "Auto-Calculate (10% margin)" button. Hazardous propellant fueling safety costs are now mandatory (previously, making it optional was a false choice since buying it was always strictly optimal).
 
-**推進系統**：聯胺、AF-M315E、MMH/NTO 雙組元（取代雙氧水——GEO 遠地點引擎的標準）、霍爾推進器、離子推進器。推進劑以 kg 滑桿設定，即時顯示 Δv，另有「自動計算（預留 10% 餘量）」按鈕。毒性推進劑的防護加注改為強制成本（原本「可不加購」的選項永遠值得買，不是真正的選擇）。
+**Events** (9 types): Solar Particle Event, Geomagnetic Storm, Thunderstorm Delay, Meteor Shower, Orbital Debris, Ground Station Maintenance, Mass Growth, Budget Cut, and All Nominal—each grounded in real physical mechanisms and historical precedents. Removed "Upper-Level Wind Shear" and "Extreme Cold" (in reality, both simply cause launch delays, making them redundant with thunderstorms).
 
-**事件**（9 種）：太陽粒子事件、地磁暴、雷雨延誤、流星雨、軌道碎片、地面站維修、質量增長、預算刪減、一切正常——每個都對應真實機制與歷史案例。移除「高空風切」「極端低溫」（真實世界中這兩者只會造成延期，與雷雨重複）。
+**Design Screen:** The right-hand "Mission Budget Table" displays real-time readouts for five engineering budgets—Cost, Mass, Power, Daily Data, and Δv (mirroring real systems engineering mass/power/link/Δv budgets)—alongside mission value breakdowns and reliability metrics. Every row is clickable for a physical explanation.
 
-**選件畫面**：右側「任務預算表」即時顯示成本、質量、電力、每日資料、Δv 五項工程預算（真實系統工程的 mass/power/link/Δv budget），加上任務價值拆解與可靠度，每一行都可點開看原理解釋。
+**Results Screen:** The "Post-Mission Actuarial Report" compares actual delivered value against pre-launch expected value, cites real-world historical analogs for failure modes, and lists all single-change design alternatives, highlighting the single tweak that yields the highest gain in expected value. The radar chart was replaced with 6 meaningful mission metrics.
 
-**結果畫面**：「事後精算報告」比較實際交付價值與發射前期望值、說明失敗原因的真實案例，並列舉所有「只改一個選擇」的方案，找出最能提升期望值的那一個。雷達圖改為 6 個有意義的任務指標。
+**Campaign Levels:** Pass condition changed to delivering ≥ 50% mission value. Level 1 auto-configures propulsion (selecting hydrazine or bipropellant based on orbit and auto-calculating propellant mass); Level 2 unlocks propulsion selection; Level 3 introduces space environment events (guaranteed Solar Particle Event); Level 4 unlocks all mechanics.
 
-**劇情關卡**：過關條件改為交付 ≥ 50% 任務價值。第 1 關系統自動配置推進（依軌道選聯胺或雙組元並自動計算推進劑），第 2 關開放推進系統，第 3 關加入事件（必定是太陽粒子事件），第 4 關全開。
+**Balance Verification:** Used Python scripts to exhaustively enumerate all configurations, tuning budgets (initially $210M for LEO, $230M for GEO; updated on 2026-10-12 to per-mission budgets) and part parameters to ensure every mission has a distinct optimal build with no "all-premium" dominant strategy. Verified via 4,000 Monte Carlo simulations that displayed expected values match actual dice-roll averages (error < 2.1%).
 
-**平衡驗證**：以 Python 窮舉所有配置調整預算（當時 LEO $210M、GEO $230M；2026-10-12 改成每種任務各自設定）與零件數值，確認每種任務的最佳配置都不同、沒有「全選高階」的必勝解；並用 4,000 次蒙地卡羅模擬確認顯示給玩家的期望值與實際擲骰結果一致（誤差 < 2.1%）。
+### Operations Phase: Reserves, Anomaly Decisions, & Extended Missions (Level 4+ / Free Play)
 
-### 運作期：預備金、異常決策、延長任務（第 4 關起／自由遊玩）
+- **Reserves** = Budget − Cost. Mirrors NASA's Joint Confidence Level (JCL) policy: major programs must budget at a 70% confidence level against overruns by holding Unallocated Future Expenses (UFE).
+- **Component Failures:** 60% are recoverable (game estimate), triggering an interactive decision modal; 40% are catastrophic. Five failure types each offer a "Paid Repair" vs. "Free Degraded Mode" choice, all drawn from real historical incidents: Battery Degradation, Primary Transmitter Failure (leasing NASA Deep Space Network 70 m antennas), Payload Anomaly (Landsat 7 Scan Line Corrector failure—missing 22% of image data yet serving nearly 20 years; repair has a 50% failure chance), Propulsion Valve Anomaly (2016 Juno mission), and Reaction Wheel Failure (Kepler K2 mission; Hubble single-gyro mode).
+- **Operational Events** (0.3/year in LEO; 0.1/year in GEO): Collision Avoidance Warning (NASA's 1/10,000 collision probability maneuver threshold), Solar Storm Alert (NOAA SWPC), and Ground Station Outage (leasing KSAT / AWS Ground Station).
+- **Extended Mission:** After surviving its design life, remaining reserves can fund mission extensions at $4M/year, up to half the design life, subject to remaining Δv.
+- **Value Cap:** Delivered value is capped at the value of completing the full design lifespan. Mission extensions only recover service time lost during anomalies—a low-resolution camera cannot become sharper simply by operating for extra years.
+- **Actuarial Estimate:** Every anomaly choice displays "Expected Remaining Mission Value" (accounting for future failure probabilities and potential mission extension funded by remaining reserves), training players in expected-value decision-making.
+- **Expected Mission Value Calculation:** Switched to a fixed-seed, 800-run Monte Carlo simulation (assuming optimal actuarial choices during operations); matches analytical formulas within < 0.4% error when operational mechanics are disabled.
+- **Verification:** Exhaustive enumeration confirms that when operational mechanics are enabled, optimal builds intentionally retain cash reserves (LEO Imaging retains ~$7M for 91.4% EV vs. 89.9% when spending everything; GEO Typhoon Tracking retains $16–43M), successfully reproducing real-world reserve-holding trade-offs.
 
-- **預備金** = 預算 − 花費。對應 NASA 的聯合信心水準（JCL）政策：大型計畫要以 70% 機率不超支編列預算，保留未分配預備金（UFE）
-- **零件故障**：60% 可挽救（遊戲估算值），跳出決策視窗；40% 直接失效。5 種故障各有「花錢修復」與「免費降級」兩個選項，全部取材自真實事件：電池衰退、主發射機故障（NASA 深空網路 70 m 天線）、酬載故障（Landsat 7 掃描校正器，缺 22% 影像仍服務近 20 年；修補有 50% 失敗機率）、推進閥門異常（2016 朱諾號）、反應輪故障（克卜勒 K2、哈伯單陀螺儀模式）
-- **運作期事件**（LEO 每年 0.3 次、GEO 0.1 次）：碰撞預警（NASA 以 1/10,000 為閃避門檻）、太陽風暴警報（NOAA SWPC）、地面站故障（租用 KSAT／AWS Ground Station）
-- **延長任務**：撐完設計壽命後，剩下的預備金以每年 $4M 延長任務，最多設計壽命的一半，且受剩餘 Δv 限制
-- **價值上限**：交付價值最多到「完整撐完設計壽命」的價值。延長任務只能補回故障期間損失的服務時間，不能讓解析度不夠的相機靠多拍幾年就變清楚
-- **精算估計**：每個選項都顯示「之後預期還能交付的任務價值」（考慮未來故障機率與預備金能換到的延長時間），讓玩家練習期望值決策
-- **期望任務價值**改用固定亂數種子、800 次的蒙地卡羅模擬（以精算估計最佳的選項作為預設策略）；關閉運作期機制時與解析公式誤差 < 0.4%
-- **驗證**：窮舉配置後發現，開啟運作期機制時最佳解會刻意保留預備金（LEO 影像保留約 $7M：91.4%，全部花光只有 89.9%；GEO 颱風追蹤保留 $16–43M），重現「保留預備金」的真實工程取捨
+### Simulation Feedback & Visuals
 
-### 模擬畫面的反饋
+- **Launch Suspense:** Launch, Ascent, Orbit Insertion, and Deployment stages each announce their probability of success before running a visual roll bar (green zone = success probability) whose pointer distribution matches the true RNG roll. Rockets now use pixel-art sprites, shake during Max-Q, and play an explosion animation with screen shake upon failure.
+- **Operations Orbit View:** Top-down view over the North Pole to accurate scale (LEO orbital radius = 1.09× Earth radius; GEO = 6.62×). Orbital periods follow Kepler's third law, and ground stations rotate with Earth. Downlink beams render only when the satellite is above the local horizon ($\cos\theta > R_\oplus / r$)—LEO passes yield brief contact windows, while GEO stays locked in continuous 24-hour contact.
+- **Mission Value Progress Bar:** Accumulates year-by-year during operations, marking the design's theoretical value cap. Extended missions render in a distinct color; satellites blink red during anomalies and turn gray upon total failure.
+- **Real Geography & 3D Geometry:** Earth uses real Natural Earth coastlines (Greenland ice sheet, Arctic sea ice). LEO uses a 97.6° Sun-Synchronous Orbit (appearing from above the North Pole as a nearly polar flattened ellipse, turning semi-transparent on the nightside/far side), while GEO hovers fixed over Taiwan's longitude. The ground station is located in Hsinchu, checking line-of-sight via 3D elevation angle > 0°. Geometry naturally yields ~4 passes/day of 8–12 minutes each, matching the ~36 min/day figure in the budget table. To prevent frame drops from skipping brief ~0.15 s contact windows, each animation frame sub-steps through timestamps since the previous frame.
+- Extended missions terminate as soon as lost value is recovered up to the design cap, preventing pointless choices where both options yield 0% gain.
 
-- **發射懸念**：發射、爬升、入軌、展開每一關先公布成功率，接著用判定條演出擲骰（綠區＝成功機率），指針落點的分布和實際擲骰完全相同。火箭改用像素火箭圖，爬升段（Max-Q）會震動，失敗時播放爆炸動畫並晃動畫面
-- **運作期軌道畫面**：從北極上空俯視地球，比例正確（LEO 軌道半徑 1.09 倍地球、GEO 6.62 倍）。衛星週期由克卜勒第三定律計算，地面站跟著地球自轉；只有在地面站看得到衛星時（地平線條件 cosθ > R⊕/r）才畫出下傳光束——LEO 只會閃過短暫的通訊窗口，GEO 則和地面站同步旋轉、24 小時連線
-- **任務價值進度條**：運作期間逐年累積，標出此設計的價值上限；延長任務改用另一種顏色；發生異常時衛星閃紅，失效時變灰停止
-- **改為真實地理與 3D 幾何**：地球改用 Natural Earth 真實海岸線（格陵蘭冰原、北冰洋海冰）；LEO 改為傾角 97.6° 的太陽同步軌道（從北極看是一條幾乎通過北極的扁軌跡，轉到地球背面時半透明），GEO 定點在台灣經度上空；地面站設在新竹，以 3D 仰角 > 0 判斷能否通訊。幾何自然算出每天約 4 次、每次 8–12 分鐘的通訊窗口，與預算表的「每天約 36 分鐘」一致。為了避免電腦卡頓時錯過只有約 0.15 秒的窗口，每一格畫面都會補檢查前一格之後的時刻
-- 延長任務只延長到補回損失的價值為止，達到上限就結束，避免出現「兩個選項都是 0%」的無意義決策
+### Scoring System
 
-### 評分系統
+- **Actuarial Score** (0–100) = Player Design Expected Value ÷ Theoretical Maximum Expected Value for the exact same scenario (Objective × Event × Unlocked Mechanics). Evaluates decision quality rather than luck: the same design earns the exact same score regardless of RNG rolls. Ranks: S ≥ 95, A ≥ 85, B ≥ 70, C ≥ 50.
+- **Theoretical Optimum:** Precomputed in-browser via `tools/best-designs.html` across ~38,000 configurations (2 orbits × rockets × 5 subsystems × propulsion types × 8 propellant loads), generating 60 scenarios in ~1.5 minutes saved to `js/bestdesigns.js`. Scenarios with operational decisions pre-filter the top 400 builds analytically, rank them via 120 Monte Carlo runs, and finalize the top 15 with full 800-run simulations (matching a 7× wider search identically). Tables store a parameter fingerprint; if balance numbers are edited without regenerating the table, the game falls back to live calculation (~1 second).
+- **Campaign Progression:** Pass by delivering ≥ 50% mission value **OR** achieving an Actuarial Score ≥ 85 ("Unlucky outcome, sound engineering—Review Board approves"). Directly addresses team member Yong-Wei Liang's feedback about "repeated failures due to bad luck" without breaking physics (no RPG skill points to artificially boost rocket reliability).
+- **Challenge Medals:** 3 per mission type, evaluated strictly on design parameters. All thresholds are verified via scripts to be achievable yet require deliberate trade-offs:
+  - *Master Actuary:* Score ≥ 95
+  - *Shoestring Miracle:* Cost ≤ 70% of budget, with Score ≥ 75 (Imaging) / 70 (Climate) / 85 (Typhoon) / 45 (Comms)
+  - *Bulletproof (Imaging, Climate):* Total success probability ≥ 92%, Score ≥ 65 (reliability isn't free)
+  - *All-Electric (Typhoon, Comms):* Use electric propulsion, Score ≥ 90 (Typhoon) / 75 (Comms)
+  - *Scrapped Concepts:* "Engineering Margin" medal (optical optimum already had spare margin, making it a freebie) and "SmallSat" medal (Electron could score at most 17 points).
+- **Waterfall Chart Replacing Radar Chart:** Starts from an ideal 100% mission, sequentially subtracting losses from Coverage, Performance, Data Downlink, Power, and Lifespan (red bars = design bottlenecks) to arrive at Design Value; then subtracts Launch, Deployment, and Operational risks (orange bars) to arrive at Expected Value; finally displays Theoretical Optimum and Actual Delivered Value side-by-side. Because the 6 radar axes are multiplicative, polygon area was meaningless; the waterfall chart immediately shows "what ate the mission value."
+- **Personal Best:** Tracks highest Actuarial Score per mission type.
 
-- **精算評分**（0–100）＝玩家設計的期望價值 ÷ 同一情境（任務目標 × 事件 × 開放機制）下的理論最佳期望值。評的是決策品質而非運氣：同一個設計不論擲骰結果都拿同樣的分數。等第 S ≥ 95、A ≥ 85、B ≥ 70、C ≥ 50
-- **理論最佳**由 `tools/best-designs.html` 在瀏覽器裡窮舉約 3.8 萬種設計（兩種軌道 × 火箭 × 五種零件 × 推進系統 × 8 種推進劑量），60 個情境約 1.5 分鐘產生，寫入 `js/bestdesigns.js`。有運作期決策的情境先用解析公式篩出前 400 名、再用 120 次蒙地卡羅排序、最後 15 名用正式的 800 次決定；與篩選範圍擴大 7 倍的搜尋結果完全相同。表格附有平衡數值的指紋，數值改了沒重新產生時，遊戲會改成當場計算（約 1 秒）
-- **劇情關卡過關**：交付 ≥ 50% 任務價值，**或**精算評分 ≥ 85（「運氣不好但設計正確，審查委員會放行」）。回應組員梁詠為「運氣不好一直摔」的回饋，又不違反物理（不靠技能點讓火箭變可靠）
-- **挑戰勳章**：每種任務 3 枚，同樣只看設計。所有門檻都用工具驗證過「拿得到、但要刻意取捨」：
-  - 精算大師：評分 ≥ 95
-  - 小預算大任務：花費 ≤ 預算 70%，評分 ≥ 影像 75／氣候 70／颱風 85／通訊 45
-  - 萬無一失（影像、氣候）：完全成功機率 ≥ 92%，評分 ≥ 65——可靠度不是免費的
-  - 全電推進（颱風、通訊）：使用電推進，評分 ≥ 颱風 90／通訊 75
-  - 試過但放棄的設計：「工程餘裕」勳章（光學任務的最佳解本來就有餘裕，等於送分）、「小衛星」勳章（Electron 最多只拿得到 17 分）
-- **瀑布圖取代雷達圖**：從理想任務 100% 開始，依序扣掉覆蓋、性能、資料下傳、電力、壽命（紅色＝設計限制），得到設計價值；再扣掉發射、展開、運作期風險（橘色），得到期望價值；最後並列理論最佳與這次實際交付。雷達圖的六個軸是相乘關係，面積沒有意義；瀑布圖直接看出「價值被什麼吃掉了」
-- **個人最佳**：每種任務記錄最高精算評分
+### Restrictive Events (Adapted from You-Ren Zhou's Proposals)
 
-### 限制型事件（組員周宥任的提案改造）
+- **Export Control:** All components restricted to Economy or Standard tiers (reflecting real ITAR/EAR regulations, which most commonly restrict radiation-hardened electronics and high-resolution optics).
+- **Crowded Launch Manifest:** Falcon 9 is fully booked with constellation deployments; players may only select Electron or Falcon Heavy.
+- **National Flagship Program:** Payload must be Premium tier, but budget increases by +$20M.
+- Restricted cards are grayed out with explicit explanations; both Theoretical Optimum and Post-Mission Actuarial Analysis evaluate only valid choices so scoring remains fair. Exhaustive enumeration verified that every mission remains solvable under all three events with distinct optimal builds (e.g., Typhoon Tracking under Export Control caps at 33% value because without a Ka-band high-gain dish, GEO data barely gets downlinked).
+- Rejected "International Condemnation: 50% pre-launch failure chance": Offers no player agency, reflects no real mechanism, and teaches nothing.
 
-- **出口管制**：所有部件只能選經濟或標準（真實的 ITAR／EAR 管制，抗輻射電子與高解析度光學最常被管制）
-- **發射排程壅擠**：Falcon 9 被星系部署排滿，只能選 Electron 或 Falcon Heavy
-- **國家旗艦計畫**：酬載必須是高階，但預算多 $20M
-- 不能選的卡片會變灰並寫出原因；理論最佳與「事後精算」都只考慮能選的選項，所以精算評分仍然公平。窮舉驗證每種任務在三個事件下都有解，而且最佳設計都和平常不同（例如出口管制下颱風任務只剩 33%：沒有 Ka 頻段高增益天線，GEO 的資料幾乎傳不回來）
-- 沒採用「國際譴責：發射前 50% 失敗」：沒有決策、沒有真實機制，玩家學不到東西
+### Attitude Control Subsystem (Data by Yong-Wei Liang)
 
-### 姿態控制（組員梁詠為的資料）
+- New subsystem **"Attitude Control,"** unlocked alongside Propulsion in Level 2 (auto-equipped with 3 reaction wheels in Level 1):
+  - *Economy:* Magnetorquers (~2° pointing accuracy, 3 kg, $0.5M). Geomagnetic field strength scales as $1/r^3$, meaning GEO's field is ~1/226th that of a 550 km LEO—resulting in > 90° equivalent pointing error ("unable to stabilize pointing") and zero mission value.
+  - *Standard:* 3 Reaction Wheels + Star Tracker (~0.02° pointing accuracy).
+  - *Premium:* 4 Reaction Wheels (pyramid configuration), providing 1 hot spare and using "Redundant" failure rates.
+- Added **"Pointing"** multiplier to Mission Value = $\sqrt{\text{Mission Requirement} \div \text{Actual Pointing Error}}$. Requirements: High-Res Imaging 0.05°, Climate Monitoring 0.5° (wide swath), Typhoon Tracking 0.05°, Comms Spot Beam 0.1°.
+- Split original spacecraft bus ($8M / 40 kg / 60 W) into "Avionics + Thermal + Harness" ($4M / 20 kg / 20 W) plus Standard Attitude Control, keeping baseline balance intact.
+- Added Attitude Control operational anomalies (Reaction Wheel failure modeled on Kepler K2; converts to "Magnetorquer Coil Open-Circuit" if only magnetorquers are fitted). Renamed spacecraft bus anomaly to "Flight Computer Crash" (Single-Event Upset, modeled on Hubble's 2021 payload computer incident).
+- Added **"Thermal Dissipation"** readout row to the budget table (informational only; does not penalize value): Virtually all consumed electrical power converts to waste heat. Radiator area = Heat Load ÷ Net Radiative Rejection per m² (250 W/m² in LEO, 330 W/m² in GEO, derived from $\varepsilon\sigma T^4$ minus absorbed Earth IR), indicating whether passive cooling (≤ 1 kW), heat pipes (≤ 5 kW), or loop heat pipes + deployable radiators (> 5 kW) are required. Abstract stats like "Thermal Reliability Bonus: Medium" from team drafts violated the physics-first rule, so thermal was implemented as an educational engineering readout rather than a new purchasable part.
+- Rejected "Cold Gas Thrusters" from team drafts: Attitude thrusters and orbit-keeping propulsion are already abstracted into the Propulsion subsystem; splitting them would cause combinatorial bloat.
+- **Theoretical Optimum Breakdown:** Expandable on the Results screen, teaching players that "optimal designs don't always spend the entire budget or pick all-premium parts."
 
-- 新部件「姿態控制」，第 2 關和推進系統一起開放（第 1 關系統自動配 3 顆反應輪）：
-  - 經濟：磁力棒，指向約 2°，3 kg、$0.5M。地磁強度 ∝ 1/r³，GEO 的地磁只有 550 km 低軌的約 1/226，等效指向誤差超過 90° 就是「無法穩定指向」，價值歸零
-  - 標準：3 顆反應輪＋星象儀，指向約 0.02°
-  - 高階：4 顆反應輪（金字塔構型），多 1 顆備份，故障率用「冗餘」等級
-- 任務價值多一個因子「指向」＝ √(任務需求 ÷ 實際指向誤差)。需求：高解析影像 0.05°、氣候監測 0.5°（寬刈幅）、颱風追蹤 0.05°、通訊點波束 0.1°
-- 衛星本體從 $8M／40 kg／60 W 拆成「電腦＋熱控＋線路」$4M／20 kg／20 W，加上標準姿態控制剛好等於原本的數字，所以平衡大致不變
-- 運作期故障多一類：姿態控制（反應輪故障，沿用克卜勒 K2 的故事；只有磁力棒時改成「磁力棒線圈斷路」）。衛星本體故障改成「衛星電腦當機」（單事件翻轉，哈伯 2021 年酬載電腦事件）
-- 預算表新增「散熱」一行（只顯示、不影響價值）：用掉的電幾乎都變成熱，散熱面積＝熱量 ÷ 每平方公尺淨散熱量（LEO 250 W/m²、GEO 330 W/m²，由 εσT⁴ 扣掉吸收的地球紅外線估算），並依熱量判斷需要被動散熱（≤ 1 kW）、熱管（≤ 5 kW）或迴路熱管＋可展開散熱板。組員表格裡的熱控「可靠度加成：中」這類抽象數值不符合「遵守真實物理」的原則，所以先做成教育性的熱預算，而不是一個新選項
-- 沒採用組員表格裡的「冷氣推進」選項：姿態控制用的小推力器和軌道維持的推進系統在遊戲裡已經合併成推進系統，再分開會讓決策數暴增
-- **理論最佳設計**：結果頁可展開查看，學到「最佳解不一定把錢花光、也不一定全選高階」
+## Visual & UI Unification
 
-## 美術統一
+- **Typography:** Titles, buttons, numbers, and labels switched to Traditional Chinese pixel font **Cubic 11** (俐方體11號, SIL OFL license, loaded via jsDelivr pinned at v1.500); body paragraphs use **Noto Sans TC**. Previously, Press Start 2P only supported Latin characters, causing Chinese characters to fall back to system fonts and mix two typefaces inside a single button.
+- **Font Sizes:** Pixel fonts restricted strictly to 11 / 16 / 22 / 33 / 44 px; body text restricted to 12 / 13 / 14 px.
+- **Color Palette:** Centralized as CSS variables at the top of `css/style.css`; eliminated hardcoded hex values in components.
+- **Frames:** Major panels use 9-slice frames matching the button palette (with HUD corner brackets); cards and list items use 2 px solid borders with 4 px border-radius.
+- **Icons:** Replaced all in-game emojis with custom pixel-art icons (55 icons generated via `tools/pixel-icons.py` with automatic 1 px dark outlines and top-left lighting). Rendered strictly at 1x or 2x native resolution to prevent uneven pixel scaling.
+- **Home Screen:** Pixel-art title + starfield, planets, and rocket; 4-stage Campaign progress tracker; best scores and medal displays across mission types.
+- **Mission Flow:** Top step indicator bar across Briefing, Design, Launch, and Report screens; labeled stage nodes on the Launch timeline.
+- **Achievements Screen:** Added Challenge Medal showcase (3 per mission) and unlock counter.
 
-- **字型**：標題、按鈕、數字、標籤改用繁中像素字型「俐方體11號」（Cubic 11，SIL OFL 授權，從 jsDelivr 載入，釘選 v1.500）；長段說明文字用 Noto Sans TC。原本的 Press Start 2P 只有英文字母，中文會退回系統字型，造成一個按鈕裡混兩種字
-- **字級**：像素字只用 11／16／22／33／44 px，內文只用 12／13／14 px
-- **顏色**：全部集中在 `css/style.css` 開頭的變數，元件裡不再寫死色碼
-- **外框**：大面板用和按鈕同配色的九宮格外框（四角 HUD 角括號），卡片與列表用 2 px 實線＋4 px 圓角
-- **圖示**：遊戲裡的 emoji 全部換成像素圖示（`tools/pixel-icons.py` 產生 55 個，自動補 1 px 外框、光源左上）。顯示尺寸只用原圖的 1 或 2 倍，避免像素被不均勻拉伸
-- **首頁**：像素字標題＋星空、行星、火箭；劇情關卡四段進度；四種任務的最佳評分與勳章收集
-- **任務流程**：簡報、設計、發射、報告四個畫面頂端都有步驟指示；發射階段的進度點加上階段名稱
-- **成就頁**：新增挑戰勳章收集區（每種任務 3 枚）與解鎖數量
+## Playtest Feedback Overhaul
 
-## 組員試玩回饋改版
+Team playtesting combined with analytical scripts pinpointed one root flaw: **small rockets served no purpose, and budgets were far too generous.** Previously, Electron topped out at 17 points on any mission, and almost every optimal design simply bought all-premium components.
 
-組員試玩後的回饋，加上用工具驗證的數據，指向同一個根本問題：**小火箭沒有存在意義、預算太寬鬆**。改版前 Electron 在任何任務最多只拿得到 17 分，大多數任務的最佳設計幾乎把零件全選高階。
+### Rebalancing: New Rocket, New Mission, Tighter Budgets
 
-### 平衡：新火箭、新任務、預算收緊
+- **PSLV (Small-Medium Lift):** India's workhorse launcher—1,750 kg to SSO, ~$25M, 59 successes in 64 flights (90.9% Laplace reliability). Serves as a realistic "cheap but less reliable" trade-off: optimal builds for Imaging and Climate now use PSLV, saving $49M for better instruments, whereas switching to Falcon 9 (99.4%) caps optimal score around 89. Mirrors real life—0.25 m resolution Cartosat-3 launched on PSLV. Evaluated Firefly Alpha (3/7 successes, ~44% estimated reliability), but deemed it too risky to ever be rational.
+- **Sub-Synchronous Transfer Orbit (Sub-GTO):** PSLV can only inject GEO payloads into a 284 × 20,650 km transfer orbit at ~18° inclination, requiring an extra ~0.16 km/s Δv to circularize into GEO (computed directly from orbital mechanics). This unlocked a new optimal build for Typhoon Tracking: an all-electric PSLV + Hall-effect thruster satellite (Level 2).
+- **5th Mission Type — "Ionosphere Probe":** Inspired by FORMOSAT-5's AIP and FORMOSAT-7's radio occultation receivers. Plasma instruments must fly *in situ* through the ionosphere; GEO (35,786 km) sits far outside it, yielding 0 coverage. Because the instrument weighs only a few kilograms and the budget is $40M, **Electron is the optimal launcher**—giving the small rocket a genuine niche. Performance scales with measurable plasma parameters (2 for Langmuir probe, 6 for AIP-class, 7 with GNSS occultation).
+- **Per-Mission Budgets:** Tightened so buying all-premium parts always exceeds budget: Imaging & Climate LEO = $145M (down from $210M → $175M); Typhoon GEO = $160M (down from $230M); Comms GEO = $230M (already tight, later adjusted to $250M); Ionosphere = $40M.
+- **Minimum Power Threshold for Electric Propulsion:** Electric thrusters can throttle down, but fail to ignite below 1/4 rated power (NSTAR throttles from 0.5–2.3 kW). Previously, LEO builds skipped thruster power checks, allowing a 150 W SmallSat to mount a 1,350 W Hall thruster.
+- **Propellant Slider Increment:** Reduced from 25 kg to 5 kg so SmallSats carrying only a few kilograms of propellant aren't forced to carry 3× excess mass.
+- **Optimal Expected Values (Level 2 / Free Play):** Imaging & Climate = 86% / 89%; Typhoon = 73% / 83%; Comms = 73% / 82%; Ionosphere = 79% / 84.5%.
 
-- **PSLV（中小型）**：印度的主力火箭，1,750 kg 到 SSO、約 $25M、64 次發射 59 次成功（拉普拉斯估計 90.9%）。它成了「便宜但沒那麼可靠」的真實選項：影像與氣候任務的最佳設計改用 PSLV，省下 $49M 買更好的零件；改搭 Falcon 9（99.4%）的最佳設計只有約 89 分。真實世界也一樣：0.25 m 解析度的 Cartosat-3 就是 PSLV 發射的。考慮過 Firefly Alpha（7 次發射 3 次成功，估計可靠度只有 44%），風險高到永遠不會是合理選項，所以沒採用
-- **次同步轉移軌道**：PSLV 送 GEO 衛星只能到 284 × 20,650 km、傾角約 18° 的轉移軌道，圓化成 GEO 要多約 0.16 km/s（由軌道力學直接計算）。颱風任務因此出現新的最佳解：PSLV＋霍爾推進器的全電推衛星（第 2 關）
-- **第 5 種任務「電離層探測」**：對應福衛五號的 AIP 與福衛七號的掩星接收機。電漿儀器要「身在其中」才量得到，GEO（35,786 km）遠在電離層外，覆蓋直接是 0。儀器只有幾公斤、預算 $40M，所以 **Electron 是最佳選擇**——小火箭終於有了真實的用途。性能以「能量測的電漿參數數目」計算（朗繆爾探針 2 項、AIP 級 6 項、加掩星接收機 7 項）
-- **預算改為每種任務各自設定**，並抓緊到「每樣都選最好的一定超支」：影像、氣候 LEO $175M（原 $210M）；颱風 GEO $160M（原 $230M）；通訊 GEO $230M（本來就很緊，維持不變）；電離層 $40M
-- **電推進的最低功率**：電推進器可以降功率運轉，但可用電力低於額定的 1/4 就點不著（NSTAR 的調節範圍是 0.5–2.3 kW）。之前低軌道沒有檢查電推進耗電，150 W 的小衛星也能裝 1,350 W 的霍爾推進器
-- **推進劑調整單位** 25 kg → 5 kg：小衛星只需要幾公斤推進劑，原本自動計算會多帶 3 倍以上
-- 各任務的最佳期望值（第 2 關／自由遊玩）：影像、氣候 86%／89%；颱風 73%／83%；通訊 73%／82%；電離層 79%／84.5%
+### Medal Re-Verification
 
-### 勳章重新驗證
+- *Shoestring Miracle:* Score thresholds updated to Imaging 75 / Climate 70 / Typhoon 70 / Comms 45 / Ionosphere 85.
+- *Bulletproof:* Assigned to Imaging (total success probability ≥ 90%, Score ≥ 65) and Ionosphere (≥ 80%, Score ≥ 55).
+- *New Medal — "Safe Ascent" (Climate):* Launch on a rocket with ≥ 99% reliability and achieve Score ≥ 75—directly highlighting the PSLV vs. Falcon 9 trade-off.
+- *All-Electric:* Retained for Typhoon (90) and Comms (75) (later revised in Playtest Round 2).
+- *Crowded Launch Manifest* (banning Falcon 9) now affects GEO missions specifically, since LEO missions naturally favor PSLV or Electron.
 
-- 小預算大任務：評分門檻改為影像 75／氣候 70／颱風 70／通訊 45／電離層 85
-- 萬無一失：改為影像（完全成功機率 ≥ 90%，評分 ≥ 65）與電離層（≥ 80%，評分 ≥ 55）
-- 新勳章「穩穩送上天」（氣候）：使用可靠度 ≥ 99% 的火箭，評分 ≥ 75——直接對應新的 PSLV／Falcon 9 取捨
-- 全電推進（颱風 90、通訊 75）維持不變
-- 「發射排程壅擠」（不能選 Falcon 9）現在只影響 GEO 任務：LEO 任務本來就改用 PSLV 或 Electron
+### UI & Onboarding Improvements
 
-### 介面與教學
+- **Satellite Blueprints Replacing Rocket Schematics:** Players are designing a satellite, not a rocket. Hotspots now sit at true physical locations (solar wings on the sides, thruster nozzles on the zenith face away from Earth, antennas and payloads pointed nadir toward Earth), with unique schematics for each payload category. Players can begin designing without picking a rocket first.
+- **Propellant Slider Cap:** Dynamically set to 3× the auto-calculated propellant mass (previously fixed at 6,000 kg, where a LEO satellite's optimal load sat at 1.7% of the bar, making every drag look like 99%).
+- Added back-navigation buttons from Briefing to Home, and from Design to Briefing.
+- **Level 2 Propulsion Explanation:** Clarified that liftoff from Earth requires thrust-to-weight > 1 (mandating chemical rockets), whereas once in orbital free-fall, even tiny electric thrust accumulates velocity over time—correcting the misconception that chemical propulsion is always required to overcome gravity.
+- **Luck Callout:** Whenever actual delivered value deviates by > 15% from expected value, the score readout explicitly notes "Average value delivered across many flights of this exact design," explaining why the design score remains unaffected by RNG.
+- **Operations Time Scale:** Labeled "1 day = 20 s, 1 year = 2.4 s" on-screen, noting that simulating a 5-year mission in real time would take 10 hours; extended operations animation from 9 s to 12 s.
+- **Line-by-Line Theoretical Optimum Breakdown:** Expanding the optimal build lists each subsystem choice on its own row, showing the exact EV delta from swapping that single part (or noting if it causes budget/mass overruns or is banned by events).
+- **Staged Ascent Events:** Added visual booster separation (PSLV, Falcon Heavy), MECO & Stage 1 separation, and fairing jettison (~110 km), physically splitting and animating the rocket sprite segments.
+- **Stuck-Player Hints:** Failing the same level twice prompts ORBIT to hint at the optimal orbit on the Briefing/Design screens; a 3rd failure hints at the optimal rocket, and a 4th hints at the payload tier.
+- Rocket failure flavor text now cites real historical failures for each specific launcher (Electron Flight 13 in 2020, PSLV 2025–2026 failures, Falcon 9 CRS-7).
 
-- **衛星設計圖**取代火箭圖紙：設計的是衛星，熱點放在零件的真實位置（太陽能板在兩翼、推進器噴嘴在背向地球的頂面、天線與酬載朝向地球），而且三種酬載各有自己的外觀。不用先選火箭就能開始設計
-- **推進劑滑桿**上限改成自動計算量的 3 倍（原本固定 6,000 kg，LEO 衛星的正確位置只在全長的 1.7%，「隨便拉都 99%」）
-- 簡報畫面可以回到主畫面、設計畫面可以回到簡報
-- **第 2 關推進說明**：從地面起飛時推力必須大過重量，所以只能用化學火箭；但衛星入軌後在自由落體中，推力再小也能累積速度——修正「化學推進是克服引力的唯一選擇」只對地面起飛成立的說法
-- **運氣說明**：這次交付和期望值差 15% 以上時，評分旁邊直接寫出「同樣的設計飛很多次平均能交付多少」，說明分數為什麼不受這次結果影響
-- **運作期時間比例**：畫面標出「1 天 = 20 秒、1 年 = 2.4 秒」，並說明照真實比例播完 5 年任務要 10 小時；運作期動畫從 9 秒延長到 12 秒
-- **理論最佳設計逐項說明**：展開後每個選擇一行，列出「只換這一項、其他不變」時期望價值的變化，或是超支、超重、這次不能選
-- **升空動畫加入真實的飛行事件**：助推器分離（PSLV、Falcon Heavy）、第一節主引擎關機與分離、整流罩分離（約 110 km），火箭圖會真的分成幾段飛走
-- **卡關提示**：同一關連續沒過兩次，ORBIT 在簡報與設計畫面依理論最佳設計提示軌道；第三次再提示火箭、第四次提示酬載等級
-- 火箭失敗的原因改用各火箭自己的真實案例（Electron 2020 年第 13 次發射、PSLV 2025–2026 連續失敗、Falcon 9 CRS-7）
+### Ascent Animation Overhaul (Feedback by Yuan-Li Chen)
 
-### 升空畫面重做（組員陳沅澧的回饋）
+- **Gravity Turn Trajectory:** Rockets lift off vertically from the pad before pitching east, allowing gravity to curve the trajectory until horizontal at orbital insertion. Trajectory approximates a typical LEO ascent (modeled on Falcon 9: Mach 1 at ~T+1:10, Max-Q at ~T+1:20, MECO at ~T+2:45 around 85 km, reaching ~7.8 km/s horizontal velocity at insertion), with rocket pitch matching the flight path angle. Altitude and downrange distance use logarithmic scaling so both the launchpad and the Kármán line fit cleanly into a single sequence.
+- **Telemetry Altimeter:** Live readouts for altitude, velocity, and pitch angle demonstrate that "altitude is reached long before orbital velocity"—showing players that staying in orbit is about horizontal speed.
+- **Atmospheric Layers:** Sky transitions from blue to black with altitude, featuring tropospheric clouds and Mach diamonds in the exhaust, transonic vapor cone at Mach 1, throttle-down at Max-Q, stratosphere (ozone layer), exhaust plume expansion as ambient pressure drops, mesospheric meteors, visible Earth curvature above 50 km, the Kármán line, and green airglow at ~95 km. One-line captions explain each layer as it appears.
+- Dice rolls align with physical flight events: Ascent check pauses at Max-Q; Orbit Insertion check pauses mid-Stage 2 burn.
+- Removed the 8 background solar system planets from the ascent view, as seeing planets lined up during launch violated scientific realism.
 
-- **重力轉向軌跡**：火箭先垂直離開發射塔，再往東傾斜、讓重力把軌跡壓彎，越飛越平，入軌時幾乎水平。軌跡用典型低軌發射的近似值（參考 Falcon 9：約 T+1:10 突破音速、T+1:20 Max-Q、T+2:45 第一節關機時約 85 km，最後約 7.8 km/s 水平入軌），火箭的傾斜角就是飛行路徑角。高度與水平距離用對數比例換算成畫面距離，地面到卡門線才能放進同一段動畫
-- **高度計**：即時顯示高度、速度、飛行角度，讓玩家看到「高度早就夠了，速度還差很多」——入軌靠的是水平速度
-- **大氣分層**：天色隨高度由藍轉黑；對流層的雲與尾焰裡的馬赫鑽石、突破音速時的凝結雲錐、Max-Q 降推力、平流層（臭氧層）、尾焰隨氣壓下降而膨脹、中氣層的流星、50 km 以上看得到地球弧線、卡門線、約 95 km 高的綠色氣輝。每一層出現時下方字幕說明一句
-- 擲骰時機配合真實事件：爬升段的判定停在 Max-Q，入軌段停在第二節燃燒途中
-- 拿掉原本背景裡的八大行星：發射途中看不到其他行星排成一列，不符合「遵守真實」
+### Learning Objectives & Post-Mission Quiz (Suggested by Yuan-Li Chen)
 
-### 學習目標與小測驗（組員陳沅澧的建議）
+- **Level Learning Objectives:** Campaign briefings list 1–3 verifiable learning goals at the top (Level 1: Orbit selection & GEO comms; Level 2: Rocket equation, electric propulsion, magnetorquers; Level 3: Environmental events alter risk; Level 4: Reserves & anomaly response).
+- **"What You Learned" Quiz:** Results screen presents 2 multiple-choice questions (3 options each) with instant feedback and one-line explanations. Campaign levels quiz mechanics taught in that specific stage; Free Play draws from a pool of 10 questions. Questions dynamically insert numbers from the player's actual mission (e.g., their chosen comm system's downlink rate in LEO vs. GEO).
+- Answering correctly checks off and saves progress toward the level's learning objectives.
+- Quizzes **do not affect scores or level progression**, honoring the "learn from failure" design principle.
 
-- **本關學習目標**：劇情關卡的任務簡報最上方列出 1～3 句可檢驗的目標（第 1 關：軌道選擇與 GEO 的通訊；第 2 關：火箭方程式、電推進、磁力棒；第 3 關：環境事件改變的是風險；第 4 關：預備金與故障應變）
-- **你學到了什麼**：結果頁抽 2 題三選一的選擇題，作答後立刻顯示對錯與一句解釋。劇情關卡只考這一關教的機制，自由遊玩從全部 10 題抽。題目盡量用這次任務的數字（例如玩家通訊系統在 LEO 與 GEO 的實際下傳速率）
-- 答對的題目會在學習目標上打勾並存檔
-- 測驗**不影響分數也不影響過關**：延續「從錯誤中學習」，測驗只用來回饋與記錄
+### Custom Mission Mode
 
-### 自訂模式
+- Added **"Custom Mission"** to the Home Screen, unlocked from the start (allowing educators and judges to inspect any scenario directly): players freely combine any of the 5 mission objectives with any of the 12 space environment events, with all mechanics enabled.
+- Enables direct experimentation on how events reshape optimal engineering builds (e.g., seeing "Crowded Launch Manifest" push Typhoon Tracking onto PSLV). Uses the exact same scoring, medals, and records as Free Play since all combinations are precomputed in the optimum table.
 
-- 首頁新增「自訂模式」，一開始就開放（方便老師與評審直接挑想看的組合）：玩家自己挑任務目標（5 種）與太空環境事件（12 種），所有機制都開放
-- 用途：比較同一個任務遇到不同事件時，最佳設計怎麼改變（例如「發射排程壅擠」讓颱風任務改搭 PSLV）。精算評分、勳章、紀錄與自由遊玩完全相同，因為每個組合都已經在理論最佳表裡
+### Score Cap on Mission Failure
 
-### 任務失敗時的成績上限
+- **Playtest Feedback:** Having a satellite fail at 1.6 years with only 31% value delivered yet receiving an "S 98" rank felt like a bug to players.
+- **Resolution:** Separated scores into **Design Score** (Expected Value ÷ Theoretical Optimum, luck-independent, used for Review Board pass overrides and actuarial analysis) and **Mission Grade**. Whenever delivered value falls below 50%, the Mission Grade is capped at 84 (B), and challenge medals are only awarded upon mission success.
+- Results screen displays both "Your design itself scored 98" alongside the luck explanation, preserving the actuarial lesson that "good decisions do not guarantee good outcomes."
 
-- 試玩回饋：衛星 1.6 年就失效、只交付 31%，結果頁卻是 S 98 分，玩家會覺得是 bug
-- 改成兩個分數：**設計評分**（期望價值 ÷ 理論最佳，不受運氣影響，用於「審查委員會准予過關」與事後精算）與**這次的成績**。任務沒有交付到 50% 的任務價值時，成績最高 84 分（B），挑戰勳章也只在任務達成目標時頒發
-- 結果頁同時寫出「你的設計本身值 98 分」與運氣說明，保留「好決策不保證好結果」的精算觀念
+### Playtest Round 2: Demand-Sized Power Systems, Heavy Comms Satellites, & Ground Station Commands
 
-### 第二輪試玩回饋：電力依需求計算、重型通訊衛星、地面站指令
-
-- **電力系統改成依用電自動定大小**（梁詠為、JOY）：原本三個等級是固定的 150 W／5 kW／20 kW，100 W 的小衛星也能背 20 kW 太陽能板，其他零件因此無腦選最高。真實工程是先算用電、再決定太陽能板大小，所以改成選「技術」：機身貼附式（每公斤 25 W，最多 300 W，商規）、展開式砷化鎵（35 W/kg，太空級）、捲展式 ROSA（70 W/kg，含冗餘電池）。太陽能板額定功率 =（用電＋電推進器耗電）÷ 軌道日照係數，質量與成本照每瓦計算
-- 小衛星不能再「無腦電推」：裝霍爾推進器要多 1,350 W 的電，太陽能板跟著變大變貴；機身貼附式最多 300 W，連點都點不著
-- **高通量轉發器 1,400 → 2,200 kg**（ViaSat-1 發射質量約 6.7 噸）。化學推進的高階通訊衛星超過 Falcon 9 的 5.5 噸 GTO 運力，要嘛買 Falcon Heavy，要嘛改全電推進——這正是波音 702SP 全電推衛星出現的原因。理論最佳是 Falcon 9＋霍爾推進器，Falcon Heavy＋雙組元是接近的第二名
-- 預算重新校準：影像、氣候 LEO $145M、通訊 GEO $250M
-- 勳章：全電推進只留給颱風任務（評分門檻 90 → 80）；通訊任務的最佳解本來就是全電推，改成新勳章「即刻開播」：用化學推進、評分 ≥ 75，實際上要搭 Falcon Heavy，讓重型火箭有了明確的用途
-- **推進器卡片直接顯示「這次任務約需多少 kg 推進劑」**：LEO 只要 0.15 km/s，選哪種推進器差別很小（這是正確的物理）；GEO 要約 2.6 km/s，差別一眼看得出來
-- **地面站指令（QTE，李彥宜的建議）**：運作期衛星經過新竹上空時，跳出「發送下傳請求」按鈕，約 1.6 秒內要按下；GEO 改成每 3 秒一次例行指令。結果頁顯示成功次數。真實衛星要等地面站的指令才會下傳，錯過的資料存在船上等下一次，所以不影響任務價值與評分
-- 不採用：星際探測器（周宥任：機制會變太複雜）。「風險太簡單」待確認梁詠為的具體意思
+- **Auto-Sized Power Systems Based on Power Demand** (Yong-Wei Liang, JOY): Previously, power tiers had fixed outputs (150 W / 5 kW / 20 kW), allowing a 100 W SmallSat to mount a 20 kW array and mindlessly max out every other part. Real spacecraft engineering sizes the solar array *after* calculating bus and payload power loads. Players now choose **solar array technology**: Body-Mounted Cells (25 W/kg, 300 W cap, COTS), Deployable GaAs Arrays (35 W/kg, Space-grade), and Roll-Out ROSA Arrays (70 W/kg, includes redundant batteries). Required array wattage = (Bus + Payload + Electric Thruster Load) ÷ Orbital Sunlight Factor, scaling mass and cost linearly per watt.
+- SmallSats can no longer trivially mount electric propulsion: adding a Hall thruster requires an extra 1,350 W, bloating solar array mass and cost—and body-mounted cells (300 W max) cannot ignite it at all.
+- **High-Throughput Transponder Mass Increased from 1,400 → 2,200 kg** (ViaSat-1 launched at ~6.7 metric tons). A chemically propelled premium comms satellite now exceeds Falcon 9's 5.5-ton GTO payload limit, forcing players to either buy Falcon Heavy or switch to an all-electric bus—mirroring the real-world emergence of Boeing's all-electric 702SP platform. Theoretical optimum is Falcon 9 + Hall Thruster, with Falcon Heavy + Bipropellant as a close runner-up.
+- **Re-Calibrated Budgets:** Imaging & Climate LEO = $145M; Comms GEO = $250M.
+- **Medal Adjustments:** Restricted *All-Electric* to Typhoon Tracking (lowering score threshold from 90 → 80). Since Comms already favors all-electric as its optimal build, replaced its medal with **"Instant Broadcast"**: use chemical propulsion with Score ≥ 75 (effectively requiring Falcon Heavy, giving the heavy launcher a clear purpose).
+- **Estimated Propellant Readout on Thruster Cards:** Cards now display "Estimated propellant needed for this mission: ~X kg." LEO requires only ~0.15 km/s, so thruster choice barely changes propellant mass (accurate physics), whereas GEO requires ~2.6 km/s, making efficiency differences immediately obvious.
+- **Ground Station Pass QTE** (Suggested by Yan-Yi Li): During operations, whenever a LEO satellite passes over Hsinchu, a "Send Downlink Command" button pops up for ~1.6 s (GEO triggers a routine command prompt every 3 s). Results screen displays successful contact count. Because real satellites buffer data onboard until commanded by a ground station, missed prompts do not penalize mission value or score.
+- **Rejected:** Deep-space / interplanetary probes (You-Ren Zhou: mechanics would become overly complex). Pending clarification from Yong-Wei Liang on what "risks feel too simple" entails.
