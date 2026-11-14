@@ -1,95 +1,91 @@
-# 美術素材清單 — 太空精算師
+# Art Asset Checklist — Space Actuary
 
-這是一份工作清單，用來追蹤目前哪些畫面元素還是色塊/emoji 佔位，哪些已經換成真的美術素材。畫完/生成完丟進對應資料夾。
+This is a working checklist to track which visual elements are currently placeholder color blocks/emojis and which have been replaced with final art assets. Drop completed/generated files into their corresponding folders.
 
-## 資料夾規則
-
-```
+## Folder Structure & Naming Rules
 image/
-  Stars/      行星（已存在，Saturn.png 已完成）
-  rocket/     火箭本體、爆炸效果
-  effects/    噴射尾焰、雲朵
-  parts/      衛星部件圖示（5 類 × 3 檔）
-  icons/      事件圖示、成就圖示
-  ui/         按鈕外框、面板外框、標題 Logo
-  mascot/     ORBIT 吉祥物
-```
+Stars/      Planets (existing; Saturn.png completed)
+rocket/     Rocket vehicles, explosion effects
+effects/    Exhaust plumes, clouds
+parts/      Satellite component icons (5 categories × 3 tiers)
+icons/      Event icons, achievement icons
+ui/         Button frames, panel frames, title logo
+mascot/     ORBIT mascot
+All filenames must use **lowercase letters + underscores/hyphens**, matching internal game IDs wherever possible (see the "Filename" column below) to allow seamless integration without manual mapping or naming mismatches.
 
-檔名一律用**英文小寫 + 底線/連字號**，且盡量對應遊戲內部的 id（見下表「檔名」欄），這樣我串接時不用另外對照，也不會生成完才發現名字對不上。
+## Art Asset Sourcing Options
 
-## 美術素材來源選項
-
-- **Claude 直接用程式碼生成**：適合幾何形狀類（行星、UI 按鈕/面板外框），零成本、色盤可控、改起來便宜。目前 8 顆行星已用這個方式完成。
-- **[Kenney.nl](https://kenney.nl/)**：免費 CC0 現成素材包，免註冊直接下載，可商用。跟本專案相關的有 [Planets](https://kenney.nl/assets/planets)、[Simple Space](https://kenney.nl/assets/simple-space)（火箭/太空船參考）、[UI Pack - Pixel Adventure](https://kenney.nl/assets/ui-pack-pixel-adventure)（像素風按鈕/面板，但配色偏奇幻風，可能要重新上色）。適合拿現成的，不用等生成。
-- **[Retro Diffusion](https://retrodiffusion.ai/)＋PixelLab**：專門的像素風 AI 生成工具（免費試用額度），輸出網格對齊、色盤乾淨，適合角色/有機造型（例如 ORBIT 吉祥物）這種程式碼公式畫不出來的東西。需要自行註冊帳號。
+- **Procedural Code Generation:** Ideal for geometric shapes (planets, UI button/panel frames)—zero cost, controllable color palettes, and cheap to iterate. All 8 planets were generated this way.
+- **[Kenney.nl](https://kenney.nl/):** Free CC0 ready-made asset packs, downloadable without registration and cleared for commercial use. Relevant packs include [Planets](https://kenney.nl/assets/planets), [Simple Space](https://kenney.nl/assets/simple-space) (rocket/spacecraft references), and [UI Pack - Pixel Adventure](https://kenney.nl/assets/ui-pack-pixel-adventure) (pixel art buttons/panels, though fantasy-themed and may require recoloring). Great for grab-and-go assets without waiting for generation.
+- **[Retro Diffusion](https://retrodiffusion.ai/) + PixelLab:** Specialized pixel-art AI generation tools (free trial credits) with grid-aligned outputs and clean color palettes. Ideal for organic shapes or characters (such as the ORBIT mascot) that cannot be easily drawn via code formulas. Requires account registration.
 
 ---
 
-## P0（優先度最高：畫面核心，缺了最明顯）
+## P0 (Highest Priority: Core Visuals, Most Noticeable If Missing)
 
-| 項目 | 檔名 | 建議尺寸 | 說明 |
+| Item | Filename | Recommended Size | Notes |
 |---|---|---|---|
-| ~~遊戲標題 Logo~~ ✅ | — | — | 已完成：改用繁中像素字型「俐方體11號」（Cubic 11）44 px 加像素陰影，不需要圖檔，中英文都能顯示 |
-| ~~按鈕外框~~ ✅ | `ui/button-frame.png` | 32×32 | 已完成：程式碼生成，機械控制台風格（拉絲金屬+四角螺絲+青色 LED 邊線），9-slice 接進 `.btn`，全站按鈕共用 |
-| ~~輕型火箭~~ ✅ | `rocket/rocket-light.png` | — | 已完成：致敬 Rocket Lab Electron（碳纖維黑色小型火箭） |
-| ~~中型火箭~~ ✅ | `rocket/rocket-medium.png` | — | 已完成：致敬 SpaceX Falcon 9（白色機身+柵格翼） |
-| ~~重型火箭~~ ✅ | `rocket/rocket-heavy.png` | — | 已完成：致敬 SpaceX Falcon Heavy（中央核心+雙側助推器） |
-| ~~衛星設計圖×3~~ ✅ | `rocket/blueprint-sat-optical.png`<br>`rocket/blueprint-sat-transponder.png`<br>`rocket/blueprint-sat-plasma.png` | 320×320 | 已完成：`tools/sat-art.py` 生成的衛星線稿，取代原本的火箭圖紙。零件熱點在真實位置，三種酬載外觀不同（朝地望遠鏡／轉發器艙＋反射器／迎風面電漿探測儀＋掩星天線） |
-| ~~PSLV 火箭~~ ✅ | `rocket/rocket-pslv.png` | 160×320 | 已完成：`tools/sat-art.py` 生成，致敬印度 PSLV-XL（核心級＋兩側固體捆綁助推器） |
-| ~~電漿儀器×3~~ ✅ | `parts/payload-plasma-economy.png`<br>`parts/payload-plasma-standard.png`<br>`parts/payload-plasma-premium.png` | 64×64 | 已完成：`tools/sat-art.py` 生成（多針朗繆爾探針／福衛五號 AIP 級電漿探測儀／AIP＋GNSS 掩星天線） |
-| ~~電力系統×3~~ ✅ | `parts/power-economy.png`<br>`parts/power-standard.png`<br>`parts/power-premium.png` | — | 已完成：程式碼生成（機身貼附式電池/展開式太陽能板/ROSA 捲展式太陽能板）。v2 把高階從 RTG 換成 ROSA：地球軌道衛星實際上用太陽能，RTG 功率只有約 100 W |
-| ~~通訊系統×3~~ ✅ | `parts/comm-economy.png`<br>`parts/comm-standard.png`<br>`parts/comm-premium.png` | — | 已完成：程式碼生成（S 頻段小天線/X 頻段碟形天線/Ka 頻段高增益雙碟） |
-| ~~光學酬載×3~~ ✅ | `parts/payload-optical-economy.png`<br>`parts/payload-optical-standard.png`<br>`parts/payload-optical-premium.png` | — | 已完成（v2 由 science-*.png 更名）：立方衛星相機/多光譜成像儀/大口徑望遠鏡。高階目前仍是 JWST 金色六角鏡造型，與 WorldView-3 的實際外觀不符，之後可重畫成長鏡筒望遠鏡 |
-| ~~通訊酬載（轉發器）×3~~ ✅ | `parts/payload-transponder-economy.png`<br>`parts/payload-transponder-standard.png`<br>`parts/payload-transponder-premium.png` | 64×64 | 已完成：程式碼生成（金色隔熱毯酬載艙＋饋源喇叭，高階加兩面大型反射器），供通訊任務使用 |
-| ~~推進系統×5~~ ✅ | `parts/fuel-hydrazine.png`<br>`parts/fuel-af_m315e.png`<br>`parts/fuel-biprop.png`<br>`parts/fuel-ion.png`<br>`parts/fuel-hall.png` | 64×64 | 已完成：程式碼生成（聯胺=橘色危害帶球型貯箱／AF-M315E=綠色球型貯箱／雙組元=燃料＋氧化劑雙球槽＋鐘形噴嘴／離子=柵極面盤+藍紫電漿束／霍爾=環形通道+青色電漿光暈）。v2 以雙組元取代雙氧水 |
-| ~~姿態控制×3~~ ✅ | `parts/attitude-economy.png`<br>`parts/attitude-standard.png`<br>`parts/attitude-premium.png` | 64×64 | 已完成：程式碼生成（三根銅線圈磁力棒＋磁力線／3 顆反應輪＋星象儀／4 顆反應輪＋星象儀） |
-| ~~結構與屏蔽×3~~ ✅ | `parts/structure-economy.png`<br>`parts/structure-standard.png`<br>`parts/structure-premium.png` | 64×64 | 已完成：程式碼生成，改成真實衛星結構——6061 開放式框架（看得到裡面的電路板）/鋁蜂巢夾層板剖面/7075 一體式外殼＋惠普爾犧牲板與碎片撞擊火花 |
-| ~~地球~~ | ~~`Stars/earth.png`~~ | — | **不需要**——火箭本來就是從地表發射，太空背景裡再放一顆地球邏輯不通，已從清單移除 |
+| ~~Game Title Logo~~ ✅ | — | — | Completed: Uses Traditional Chinese pixel font "Cubic 11" (俐方體11號) at 44 px with pixel drop shadow; no image file required, supports both Chinese and English. |
+| ~~Button Frame~~ ✅ | `ui/button-frame.png` | 32×32 | Completed: Procedurally generated mechanical console style (brushed metal + corner screws + cyan LED border), integrated into `.btn` via 9-slice, shared site-wide. |
+| ~~Light Rocket~~ ✅ | `rocket/rocket-light.png` | — | Completed: Inspired by Rocket Lab Electron (small black carbon-fiber rocket). |
+| ~~Medium Rocket~~ ✅ | `rocket/rocket-medium.png` | — | Completed: Inspired by SpaceX Falcon 9 (white fuselage + grid fins). |
+| ~~Heavy Rocket~~ ✅ | `rocket/rocket-heavy.png` | — | Completed: Inspired by SpaceX Falcon Heavy (center core + twin side boosters). |
+| ~~Satellite Blueprints ×3~~ ✅ | `rocket/blueprint-sat-optical.png`<br>`rocket/blueprint-sat-transponder.png`<br>`rocket/blueprint-sat-plasma.png` | 320×320 | Completed: Satellite schematics generated via `tools/sat-art.py`, replacing original rocket schematics. Component hotspots sit at realistic positions; distinct silhouettes for each payload type (nadir telescope / transponder bay + reflectors / ram-facing plasma probe + occultation antenna). |
+| ~~PSLV Rocket~~ ✅ | `rocket/rocket-pslv.png` | 160×320 | Completed: Generated via `tools/sat-art.py`, inspired by ISRO PSLV-XL (core stage + side solid strap-on boosters). |
+| ~~Plasma Instruments ×3~~ ✅ | `parts/payload-plasma-economy.png`<br>`parts/payload-plasma-standard.png`<br>`parts/payload-plasma-premium.png` | 64×64 | Completed: Generated via `tools/sat-art.py` (multi-needle Langmuir probe / FORMOSAT-5 AIP-class plasma probe / AIP + GNSS radio occultation antenna). |
+| ~~Power Systems ×3~~ ✅ | `parts/power-economy.png`<br>`parts/power-standard.png`<br>`parts/power-premium.png` | — | Completed: Procedurally generated (body-mounted cells / deployable solar arrays / ROSA roll-out solar arrays). v2 replaced premium RTG with ROSA since Earth-orbiting satellites use solar power and RTGs only output ~100 W. |
+| ~~Communications Systems ×3~~ ✅ | `parts/comm-economy.png`<br>`parts/comm-standard.png`<br>`parts/comm-premium.png` | — | Completed: Procedurally generated (S-band small antenna / X-band dish / Ka-band high-gain dual dish). |
+| ~~Optical Payloads ×3~~ ✅ | `parts/payload-optical-economy.png`<br>`parts/payload-optical-standard.png`<br>`parts/payload-optical-premium.png` | — | Completed (renamed from `science-*.png` in v2): CubeSat camera / multispectral imager / large-aperture telescope. Premium currently still uses a JWST-style gold hexagonal mirror, which doesn't match WorldView-3's actual look; can be redrawn later as a long-barrel telescope. |
+| ~~Comms Payloads (Transponders) ×3~~ ✅ | `parts/payload-transponder-economy.png`<br>`parts/payload-transponder-standard.png`<br>`parts/payload-transponder-premium.png` | 64×64 | Completed: Procedurally generated (gold MLI-wrapped payload bay + feed horns; premium adds two large reflectors) for communications missions. |
+| ~~Propulsion Systems ×5~~ ✅ | `parts/fuel-hydrazine.png`<br>`parts/fuel-af_m315e.png`<br>`parts/fuel-biprop.png`<br>`parts/fuel-ion.png`<br>`parts/fuel-hall.png` | 64×64 | Completed: Procedurally generated (Hydrazine = spherical tank with orange hazard stripe / AF-M315E = green spherical tank / Bipropellant = dual fuel + oxidizer spherical tanks + bell nozzle / Ion = gridded face + blue-violet plasma beam / Hall = annular channel + cyan plasma glow). v2 replaced hydrogen peroxide with bipropellant. |
+| ~~Attitude Control ×3~~ ✅ | `parts/attitude-economy.png`<br>`parts/attitude-standard.png`<br>`parts/attitude-premium.png` | 64×64 | Completed: Procedurally generated (three copper-coiled magnetorquers + magnetic field lines / 3 reaction wheels + star tracker / 4 reaction wheels + star tracker). |
+| ~~Structure & Shielding ×3~~ ✅ | `parts/structure-economy.png`<br>`parts/structure-standard.png`<br>`parts/structure-premium.png` | 64×64 | Completed: Procedurally generated, updated to realistic satellite structures—6061 open-frame chassis (with visible internal PCBs) / aluminum honeycomb sandwich panel cross-section / 7075 monolithic hull + Whipple sacrificial shield with micrometeoroid impact sparks. |
+| ~~Earth~~ | ~~`Stars/earth.png`~~ | — | **Not needed**—rockets launch from Earth's surface, so placing another Earth in the space background makes no logical sense; removed from list. |
 
-太陽系其餘 8 顆行星（水星、金星、火星、木星、土星、天王星、海王星、冥王星）皆已完成 ✅，用 Python/Pillow 程式碼直接產生像素風圖片（圓形遮罩＋明暗分帶＋雜訊/條紋），不是手繪也不是 AI 生成，色盤跟畫風可隨時調整重繪，成本很低。
+The remaining 8 planets of the solar system (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto) are all completed ✅, generated directly as pixel art via Python/Pillow scripts (circular mask + shaded bands + noise/stripes). Neither hand-drawn nor AI-generated, their palettes and styles can be tweaked and regenerated anytime at minimal cost.
 
 ---
 
-## P1（高優先：完成後整體質感明顯提升）
+## P1 (High Priority: Noticeably Elevates Overall Polish Upon Completion)
 
-| 項目 | 檔名 | 建議尺寸 | 說明 |
+| Item | Filename | Recommended Size | Notes |
 |---|---|---|---|
-| ~~面板外框~~ ✅ | `ui/panel-frame.png`、`panel-frame-alert.png`、`panel-frame-gold.png` | 16×16 九宮格（顯示 2 倍） | 已完成：`tools/ui-frames.py` 產生，和按鈕外框同配色，四角有 HUD 角括號；紅色版給異常警報 |
-| ~~ORBIT 吉祥物~~ ✅ | `icons/mascot-orbit.png` | 32×32（顯示 64） | 已完成：機器人頭、青色護目鏡、紅色天線燈 |
-| ~~全站星空背景~~ ✅ | `ui/starfield.png` | 256×256 平鋪 | 已完成：像素星點＋少數十字光芒的亮星 |
-| ~~爆炸效果~~ ✅ | `rocket/explosion-1.png`<br>`rocket/explosion-2.png`<br>`rocket/explosion-3.png` | 64×64 | 已完成：程式碼生成 3 格（亮核心→火球→煙塵與碎片），發射／爬升失敗時播放 |
-| ~~事件圖示×12~~ ✅ | `icons/events/solar_flare.png`<br>`geomagnetic_storm.png`<br>`bad_weather.png`<br>`small_debris.png`<br>`orbital_congestion.png`<br>`limited_ground_station.png`<br>`mass_growth.png`<br>`budget_cut.png`<br>`export_control.png`<br>`launch_manifest.png`<br>`flagship.png`<br>`nominal.png` | 48×48 | 已完成：`icons/event-*.png`，`tools/pixel-icons.py` 產生 |
-| ~~成就圖示×13＋上鎖~~ ✅ | `icons/achievement-*.png`、`icons/locked.png` | 32×32 | 已完成：`tools/pixel-icons.py` 產生 |
-| ~~火箭尾焰~~ ✅ | `rocket/exhaust.png` | 3 格 × 8×14（顯示 3 倍） | 已完成：`tools/pixel-icons.py` 產生的像素火焰輪播，重型火箭三道火焰對準三個核心 |
-| ~~其他像素圖示~~ ✅ | `icons/objective-*.png`、`medal-*.png`、`orbit-leo/geo.png`、`alert.png`、`glyph-*.png`（16×16） | 32×32／16×16 | 已完成：取代遊戲裡所有的 emoji，共 55 個 |
+| ~~Panel Frames~~ ✅ | `ui/panel-frame.png`, `panel-frame-alert.png`, `panel-frame-gold.png` | 16×16 9-slice (displayed at 2x) | Completed: Generated via `tools/ui-frames.py` matching the button frame palette, featuring HUD corner brackets; red variant used for anomaly alerts. |
+| ~~ORBIT Mascot~~ ✅ | `icons/mascot-orbit.png` | 32×32 (displayed at 64×64) | Completed: Robot head with cyan visor and red antenna light. |
+| ~~Site-Wide Starfield Background~~ ✅ | `ui/starfield.png` | 256×256 tileable | Completed: Pixel star dots + occasional bright stars with cross glints. |
+| ~~Explosion Effects~~ ✅ | `rocket/explosion-1.png`<br>`rocket/explosion-2.png`<br>`rocket/explosion-3.png` | 64×64 | Completed: Procedurally generated 3-frame sequence (bright core → fireball → smoke & debris), played on launch/ascent failure. |
+| ~~Event Icons ×12~~ ✅ | `icons/events/solar_flare.png`<br>`geomagnetic_storm.png`<br>`bad_weather.png`<br>`small_debris.png`<br>`orbital_congestion.png`<br>`limited_ground_station.png`<br>`mass_growth.png`<br>`budget_cut.png`<br>`export_control.png`<br>`launch_manifest.png`<br>`flagship.png`<br>`nominal.png` | 48×48 | Completed: Saved as `icons/event-*.png`, generated via `tools/pixel-icons.py`. |
+| ~~Achievement Icons ×13 + Locked~~ ✅ | `icons/achievement-*.png`, `icons/locked.png` | 32×32 | Completed: Generated via `tools/pixel-icons.py`. |
+| ~~Rocket Exhaust Plume~~ ✅ | `rocket/exhaust.png` | 3 frames × 8×14 (displayed at 3x) | Completed: 3-frame pixel flame animation generated via `tools/pixel-icons.py`; heavy rocket aligns three plumes to its three cores. |
+| ~~Other Pixel Icons~~ ✅ | `icons/objective-*.png`, `medal-*.png`, `orbit-leo/geo.png`, `alert.png`, `glyph-*.png` (16×16) | 32×32 / 16×16 | Completed: Replaced all emojis across the game (55 icons total). |
 
 ---
 
-## P2（有餘力再做：錦上添花）
+## P2 (Nice-to-Have: Extra Polish When Bandwidth Allows)
 
-| 項目 | 檔名 | 建議尺寸 | 說明 |
+| Item | Filename | Recommended Size | Notes |
 |---|---|---|---|
-| 雲朵 | `effects/cloud.png` | 96×36 | 目前 CSS 畫的雲朵勉強堪用，畫一張手繪版可重複擺放多個位置 |
-| ~~發射場~~ ✅ | `ui/launchpad.png` | 360×90（顯示 2 倍） | 已完成：`tools/launchpad-art.py` 程式碼生成——紅色勤務塔與擺臂、發射台與導焰槽、避雷塔、碉堡、遠山；前景用 CSS 畫草地、沙灘與海（真實發射場幾乎都在海邊），台面由程式對齊火箭底部 |
-| 星星 | `effects/star.png` | 8×8 或更小 | 目前 CSS 光點已經夠用，除非想要更有造型的星星 |
-| 按鈕 hover 樣式 | `ui/button-frame-hover.png` | 同按鈕外框 | 滑鼠移過去的變化樣式 |
-| 計量條外框 | `ui/progress-bar-frame.png` | 依版面 | 預算/質量條的裝飾外框 |
+| Clouds | `effects/cloud.png` | 96×36 | Current CSS clouds are passable; a hand-drawn sprite could be tiled/placed across multiple positions. |
+| ~~Launchpad~~ ✅ | `ui/launchpad.png` | 360×90 (displayed at 2x) | Completed: Procedurally generated via `tools/launchpad-art.py`—red service tower with swing arms, launch mount and flame trench, lightning towers, bunker, and distant mountains; foreground uses CSS grass, beach, and ocean (since real launchpads are almost always coastal), with the deck aligned by code to the rocket base. |
+| Stars | `effects/star.png` | 8×8 or smaller | Current CSS light dots are sufficient unless more stylized stars are desired. |
+| Button Hover Frame | `ui/button-frame-hover.png` | Same as button frame | Visual state change on mouse hover. |
+| Meter / Progress Bar Frame | `ui/progress-bar-frame.png` | Layout-dependent | Decorative frame for budget and mass bars. |
 
 ---
 
-## 進度追蹤
+## Progress Tracker
 
-- [x] 太陽系 8 顆行星（水星/金星/火星/木星/土星/天王星/海王星/冥王星，程式碼生成）
-- [x] 按鈕外框（機械控制台風格，程式碼生成）
-- [x] 火箭 3 檔（致敬 Electron / Falcon 9 / Falcon Heavy，程式碼生成）
-- [x] 火箭＋4 個子系統（電力/通訊/科學/結構）的真實原型文字簡介，已接進選件畫面
-- [x] 4 個子系統×3 檔＝12 張部件圖示（程式碼生成，已接進選件畫面）
-- [x] 3 張火箭圖紙（程式碼生成純線條技術圖），選件畫面改為「先選火箭→下方出現圖紙→點部件熱點展開選單」的互動方式
-- [x] 5 個燃料圖示（程式碼生成，已接進選件畫面）
-- [x] v2 真實模型新增：ROSA 太陽能板、雙組元推進、通訊轉發器×3（程式碼生成）
-- [ ] 光學酬載高階重畫成長鏡筒望遠鏡（目前 JWST 六角鏡造型與 WorldView-3 不符）
-- [x] 爆炸效果 3 格（程式碼生成）；運作期的地球改用 canvas 即時繪製（北極俯視、比例正確、Natural Earth 真實海岸線，資料在 js/earthmap.js），不需要圖檔
-- [x] 標題（像素字型）、面板外框、ORBIT 吉祥物、事件圖示×12、成就圖示×13、任務／勳章／軌道／小圖示
-- [x] 噴射尾焰（像素火焰 3 格輪播）
-- [x] 背景音樂 3 首（胡宥彥原創）：`audio/bgm/space.mp3`（宇宙氛圍：首頁、結果、運作期）、`lab.mp3`（實驗室：簡報、設計）、`launch.mp3`（發射）。原始 WAV 轉成 160 kbps MP3（26 MB → 3 MB），每首 16 小節＋殘響尾音，在第 16 小節結束時接下一輪形成無縫循環
-- [ ] P2 項目（雲朵、地面裝飾等）
+- [x] 8 Solar System planets (Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto, procedurally generated)
+- [x] Button frame (mechanical console style, procedurally generated)
+- [x] 3 rocket tiers (inspired by Electron / Falcon 9 / Falcon Heavy, procedurally generated)
+- [x] Real-world hardware descriptions for rockets + 4 subsystems (Power / Comms / Science / Structure), integrated into the component selection screen
+- [x] 4 subsystems × 3 tiers = 12 component icons (procedurally generated, integrated into the selection screen)
+- [x] 3 rocket schematics (procedurally generated pure-line technical drawings); updated selection screen flow to "Select Rocket → Blueprint Appears Below → Click Component Hotspots to Open Menu"
+- [x] 5 propellant/thruster icons (procedurally generated, integrated into the selection screen)
+- [x] v2 realistic hardware additions: ROSA solar arrays, bipropellant propulsion, communications transponders ×3 (procedurally generated)
+- [ ] Redraw premium optical payload as a long-barrel telescope (current JWST hexagonal mirror doesn't match WorldView-3)
+- [x] 3-frame explosion effect (procedurally generated); Earth during operations phase is rendered in real time via HTML5 Canvas (North Pole top-down view, accurate scale, real Natural Earth coastlines stored in `js/earthmap.js`), requiring no image file
+- [x] Title (pixel font), panel frames, ORBIT mascot, event icons ×12, achievement icons ×13, mission/medal/orbit/inline glyph icons
+- [x] Rocket exhaust plume (3-frame pixel flame loop)
+- [x] 3 BGM tracks (original compositions by You-Yan Hu): `audio/bgm/space.mp3` (space ambience: Home, Results, Operations), `lab.mp3` (laboratory: Briefing, Design), `launch.mp3` (Launch). Converted from raw WAV to 160 kbps MP3 (26 MB → 3 MB); each track spans 16 bars + reverb tail that blends into the next loop at the end of bar 16 for seamless looping
+- [ ] P2 items (clouds, ground decorations, etc.)
