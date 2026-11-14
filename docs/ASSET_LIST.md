@@ -3,6 +3,7 @@
 This is a working checklist to track which visual elements are currently placeholder color blocks/emojis and which have been replaced with final art assets. Drop completed/generated files into their corresponding folders.
 
 ## Folder Structure & Naming Rules
+''
 image/
 Stars/      Planets (existing; Saturn.png completed)
 rocket/     Rocket vehicles, explosion effects
@@ -11,6 +12,7 @@ parts/      Satellite component icons (5 categories × 3 tiers)
 icons/      Event icons, achievement icons
 ui/         Button frames, panel frames, title logo
 mascot/     ORBIT mascot
+''
 All filenames must use **lowercase letters + underscores/hyphens**, matching internal game IDs wherever possible (see the "Filename" column below) to allow seamless integration without manual mapping or naming mismatches.
 
 ## Art Asset Sourcing Options
