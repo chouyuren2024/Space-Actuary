@@ -54,8 +54,6 @@ After changing balance values in `js/data.js`, open `tools/best-designs.html` to
 
 ## Documents
 
-Internal design notes are in Traditional Chinese.
-
 - [docs/GDD.md](docs/GDD.md): game design document — the reasoning and balance checks behind each mechanic
 - [docs/REFERENCES.md](docs/REFERENCES.md): sources for every real-world number, and which values are game estimates
 - [docs/MULTIPLAYER.md](docs/MULTIPLAYER.md): multiplayer (Firebase) setup
