@@ -1,16 +1,16 @@
-# 多人連線設定（Firebase）
+# Multiplayer Setup (Firebase)
 
-多人模式用 Firebase Realtime Database 即時同步房間資料。網站本身仍放在 GitHub Pages，不需要自己架伺服器。免費的 Spark 方案最多同時 100 個連線，約 25 間 4 人房。
+Multiplayer mode uses **Firebase Realtime Database** for real-time room synchronization. The website itself remains hosted on GitHub Pages without requiring a dedicated backend server. Firebase's free Spark plan supports up to 100 concurrent connections—roughly 25 four-player rooms.
 
-已設定完成（專案 space-c-16630），js/netconfig.js 裡有設定。若 netconfig.js 是 null，正式網站上不會顯示「多人連線」按鈕。開發測試可以在網址加上 `?net=local`，用同一個瀏覽器的多個分頁互連（不需要 Firebase）。
+Setup is already complete (project `space-c-16630`), and the configuration is stored in `js/netconfig.js`. If `netconfig.js` is set to `null`, the "Multiplayer" button will remain hidden on the live site. For local development and testing, append `?net=local` to the URL to connect multiple tabs within the same browser (no Firebase required).
 
-## 一、建立 Firebase 專案（組員用自己的 Google 帳號）
+## 1. Create a Firebase Project (Using a Team Member's Google Account)
 
-1. 到 <https://console.firebase.google.com/> →「新增專案」，名稱自訂（例如 `space-actuary`）。Google Analytics 可以關掉。
-2. 左側選單「資料庫與儲存空間（Databases & Storage）→ Realtime Database」（舊版主控台叫「建構 → Realtime Database」）→「建立資料庫」。注意是 Realtime Database，不是 Firestore Database。
-   - 位置選「新加坡（asia-southeast1）」，台灣連線比較快。
-   - 安全規則先選「以鎖定模式啟動」，下一步再換成我們的規則。
-3. 建好後頁面上方會出現「資料／規則／備份／用量」分頁。點「規則」，整段換成下面這份，按「發布」：
+1. Go to <https://console.firebase.google.com/> → **"Add project"**, and enter a custom name (e.g., `space-actuary`). You can disable Google Analytics.
+2. In the left sidebar, navigate to **"Databases & Storage → Realtime Database"** (labeled **"Build → Realtime Database"** in the legacy console) → **"Create Database"**. Make sure to select **Realtime Database**, *not* Firestore Database.
+   - Choose **"Singapore (`asia-southeast1`)"** as the location for lower latency from Taiwan.
+   - Start in **"Locked mode"** for security rules; we will replace them in the next step.
+3. Once created, tabs for **"Data / Rules / Backups / Usage"** will appear at the top. Click **"Rules"**, replace the entire block with the JSON below, and click **"Publish"**:
 
 ```json
 {
@@ -25,20 +25,20 @@
 }
 ```
 
-   這份規則的意思是：只能讀寫「rooms/四碼房號」底下的資料，而且房號要符合遊戲產生的格式。沒有房號的人列不出所有房間。
+   These rules ensure that clients can only read and write under `rooms/<4-character room code>` matching the game's code format. Users without a room code cannot list active rooms.
 
-4. 左上角齒輪「專案設定 → 一般」→ 最下面「你的應用程式」→ 按 `</>`（網頁）註冊一個應用程式（不用勾 Hosting）。
-5. 畫面會出現一段 `const firebaseConfig = { ... }`，把整段大括號內容傳給負責程式的組員。
+4. Click the gear icon at the top left (**"Project settings → General"**) → scroll down to **"Your apps"** → click the `</>` (**Web**) icon to register a web app (leave Firebase Hosting unchecked).
+5. Copy the `const firebaseConfig = { ... }` object displayed on screen and send the contents inside the curly braces to the lead programmer.
 
-## 二、填進遊戲
+## 2. Add Configuration to the Game
 
-打開 `js/netconfig.js`，把 `null` 換成上一步的設定：
+Open `js/netconfig.js` and replace `null` with the configuration object from the previous step:
 
 ```js
 const FIREBASE_CONFIG = {
   apiKey: "...",
   authDomain: "....firebaseapp.com",
-  databaseURL: "https://....asia-southeast1.firebasedatabase.app",
+  databaseURL: "[https://....asia-southeast1.firebasedatabase.app](https://....asia-southeast1.firebasedatabase.app)",
   projectId: "...",
   storageBucket: "...",
   messagingSenderId: "...",
@@ -46,29 +46,29 @@ const FIREBASE_CONFIG = {
 };
 ```
 
-一定要有 `databaseURL`。如果設定裡沒有，到 Realtime Database 頁面最上方複製網址補上。
+Make sure `databaseURL` is included. If it is missing from the snippet, copy the URL displayed at the top of the Realtime Database page and add it manually.
 
-這段設定本來就會出現在網頁原始碼裡，不是密碼；能寫什麼由上面的資料庫規則決定。
+*(Note: This config object is publicly exposed in the client-side source code and is not a secret key; write permissions are enforced by the database security rules above.)*
 
-## 三、玩法流程
+## 3. Gameplay Flow
 
-1. 一人按「多人連線 → 建立房間」，畫面出現 4 碼房號。
-2. 隊友在自己的裝置按「多人連線」，輸入房號加入（最多 4 人）。
-3. 每人認領角色；4 個角色都要有人負責，人少時一人可以兼任：
-   - 任務總監：軌道、火箭、整體預算
-   - 酬載科學家：酬載
-   - 系統工程師：電力、結構、姿態控制
-   - 通訊與飛控：通訊、推進；運作期的地面站上行和異常決策
-4. 房主選任務目標和太空事件（或隨機），按「開始任務」。
-5. 任務總監選軌道後進入設計；每個人只能改自己負責的項目，但看得到同一張設計圖和預算表。
-6. 全員按「準備發射」才會發射；任何人再改設計，所有人的「準備好」都會取消。
-7. 發射與運作的結果由房主送出的同一個亂數種子決定，所有人看到的結果完全一樣。結果頁有「團隊分工報告」。
-8. 房主按「回到房間大廳」開下一個任務。
+1. One player clicks **"Multiplayer → Create Room"**, generating a 4-character room code.
+2. Teammates click **"Multiplayer"** on their own devices and enter the room code to join (up to 4 players).
+3. Each player claims a role; all 4 roles must be covered (one player may take on multiple roles in smaller groups):
+   - **Mission Director:** Orbit, launch vehicle, overall budget
+   - **Payload Scientist:** Scientific/commercial payload
+   - **Systems Engineer:** Power system, structure & shielding, attitude control
+   - **Comms & Flight Control:** Communications, propulsion; ground station uplinks and anomaly decisions during operations
+4. The host selects the mission objective and space environment event (or randomizes them) and clicks **"Start Mission"**.
+5. After the Mission Director selects the orbit, everyone enters the design phase; each player can only modify their assigned subsystems while viewing the shared satellite blueprint and budget table.
+6. All players must click **"Ready for Launch"** before liftoff; if anyone modifies the design afterward, everyone's ready status resets.
+7. Launch and operational outcomes are determined by a shared RNG seed sent by the host, ensuring every player sees the exact same simulation results. The Results screen includes a **"Team Contribution Report"**.
+8. The host clicks **"Return to Room Lobby"** to start the next mission.
 
-## 技術說明
+## Technical Notes
 
-- `js/net.js`：資料層，Firebase 與本機測試兩種後端，介面相同。
-- `js/multiplayer.js`：房間、角色、權限、階段切換與同步。
-- 房間資料結構：`rooms/{房號}` = `{ hostId, phase, setup, mission, players, roles, design, flight, decisions }`。
-- 玩家關掉分頁或斷線時，Firebase 會自動把他移出房間；房主離開時由最早加入的玩家接手。
-- 已結束的房間會留在資料庫裡（每間只有幾 KB）。如果之後需要，可以在 Firebase 主控台手動清掉 `rooms`。
+- `js/net.js`: Data abstraction layer providing a unified interface for both Firebase and local multi-tab testing backends.
+- `js/multiplayer.js`: Handles rooms, role assignments, permissions, phase transitions, and state synchronization.
+- **Room Data Schema:** `rooms/{roomCode}` = `{ hostId, phase, setup, mission, players, roles, design, flight, decisions }`.
+- When a player closes their tab or disconnects, Firebase automatically removes them from the room; if the host leaves, host privileges transfer automatically to the earliest-joined remaining player.
+- Completed rooms remain stored in the database (only a few KB each). If needed later, you can manually clear the `rooms` node from the Firebase Console.
