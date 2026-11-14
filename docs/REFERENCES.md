@@ -101,7 +101,7 @@
 
 - 福衛五號光學遙測酬載（RSI）：口徑 450 mm、720 km 太陽同步軌道、2 m 全色／4 m 多光譜、刈幅 24 km、2017 年由 Falcon 9 發射：[FORMOSAT-5 — CATALYST](https://catalyst.earth/catalyst-system-files/professional-help/references/gdb_r/Formosat-5.html)；[RSI (FORMOSAT-5) — WMO OSCAR](https://space.oscar.wmo.int/instruments/view/rsi_formosat_5)
 - 繞射極限驗算：1.22 × 550 nm × 720 km ÷ 0.45 m ≈ 1.1 m，實際 2 m 受限於偵測器像素，兩者一致（繞射極限是理論下限）
-- 福衛七號（COSMIC-2）GNSS 掩星：接收穿過大氣層而折射的導航衛星訊號，反推溫度、氣壓、濕度垂直剖面，不受雲層影響，資料用於全球數值天氣預報：TASA／NOAA 公開資料
+- 福衛七號（COSMIC-2）GNSS 掩星：接收穿過大氣層而折射的導航衛星訊號，反推溫度、氣壓、濕度垂直剖面，不受雲層影響，資料用於全球數值天氣預報：[TASA](https://www.tasa.org.tw/en-US/space-knowledge/b9a512b9-deac-416b-a114-4ed87974209a)
 
 ### 結構材料（李彥宜整理）
 
