@@ -1,51 +1,33 @@
-# 美術協作說明（第三輪）— 四枚火箭
+# Art Collaboration Brief — Four Rockets
 
-給協助生成美術的 AI／協作者。第一輪的通用規則（`docs/ART_BRIEF.md` 的「二、工作範圍」「三、硬性規格」「遊戲色票」）照舊，這份只補充火箭的部分。第一輪說明裡「火箭不要重畫」的限制，這一輪解除。
+## 1. How Rockets Are Used In-Game
 
-- 遊戲網址：<https://dean50312-hub.github.io/space-mission-design-game/>
-- GitHub：<https://github.com/dean50312-hub/space-mission-design-game>
+1. **Rocket Selection Card:** Displayed at approximately 72 px high.
+2. **Launch Animation:** The rocket is displayed at a fixed height of 96 px, flying along a gravity-turn arc. The game code **slices** the single rocket sprite to animate stage separations:
+   - **Side Booster Separation:** Slices off vertical strips from the left and right sides of the image and animates them falling outward.
+   - **Stage 1 / Stage 2 Separation:** Slices off the bottom section (First Stage) and animates it falling downward.
+   - **Payload Fairing Separation:** Slices off the top section (Fairing).
+3. **Exhaust Plume:** Rendered separately by code, attached to the very bottom edge of the sprite and aligned with the engine nozzles.
 
-## 一、火箭在遊戲裡怎麼用
+Therefore, each rocket only requires a single complete sprite, but **the composition must allow clean separation with simple straight cuts**.
 
-1. **選火箭的卡片**：顯示約 72 px 高。
-2. **發射動畫**：火箭固定顯示 96 px 高，沿著重力轉向的弧線飛行。程式會把同一張圖**切開**做出分離效果：
-   - 兩側助推器分離：把圖片左右兩側各切掉一條，往外飛走
-   - 一、二節分離：從圖片底部切掉第一節，往下掉
-   - 整流罩分離：從圖片頂部切掉整流罩
-3. **尾焰由程式另外畫**，接在圖片最底部、對準噴嘴。
+## 2. The Four Rockets to Illustrate (All Real-World Vehicles)
 
-所以每枚火箭只要一張完整的圖，但**構圖必須讓「切一刀」就能分開**（見第三節）。
-
-## 二、要畫的四枚火箭（都是真實火箭）
-
-| 檔名 | 真實火箭 | 外觀重點 | 長寬比（寬：高） |
+| Filename | Real-World Rocket | Visual Key Points | Aspect Ratio (W:H) |
 |---|---|---|---|
-| `rocket/rocket-light.png` | Rocket Lab Electron | 細長的黑色碳纖維箭體，兩節；第一節底部 9 具小引擎；頂端是較短的整流罩 | 約 1：2（例如 110×220） |
-| `rocket/rocket-pslv.png` | ISRO PSLV-XL | 白色核心級，**兩側各有一排固體捆綁助推器**（畫面上看起來是左右各一支）；頂端是比箭體略寬的鼓起整流罩 | 約 1：2（例如 160×320） |
-| `rocket/rocket-medium.png` | SpaceX Falcon 9 | 白色細長箭體；第一節頂部有 4 片收起的柵格翼、底部有收起的著陸腿和 9 具引擎；一二節之間是黑色級間段；頂端白色整流罩 | 約 1：2（例如 156×312） |
-| `rocket/rocket-heavy.png` | SpaceX Falcon Heavy | **三支 Falcon 9 第一節並排**：中間核心較高、上面是第二節和整流罩；兩側助推器頂端各有一個圓錐鼻錐 | 接近 1：1（例如 260×270） |
+| `rocket/rocket-light.png` | Rocket Lab Electron | Slender black carbon-fiber body, two stages; 9 small engines at the bottom of the first stage; relatively short payload fairing at the top. | Approx. 1:2 (e.g., 110×220) |
+| `rocket/rocket-pslv.png` | ISRO PSLV-XL | White core stage with **a row of solid strap-on boosters on each side** (visually appearing as one booster on the left and one on the right); bulbous payload fairing at the top, slightly wider than the core body. | Approx. 1:2 (e.g., 160×320) |
+| `rocket/rocket-medium.png` | SpaceX Falcon 9 | Slender white body; first stage features 4 folded grid fins near the top, folded landing legs and 9 engines at the bottom; black interstage between Stage 1 and Stage 2; white payload fairing on top. | Approx. 1:2 (e.g., 156×312) |
+| `rocket/rocket-heavy.png` | SpaceX Falcon Heavy | **Three Falcon 9 first-stage cores side-by-side:** taller center core topped with the second stage and payload fairing; two side boosters each capped with a conical nose cone. | Nearly 1:1 (e.g., 260×270) |
 
-- **不能有任何文字、商標、國旗**：SpaceX、ISRO、Rocket Lab 的字樣和標誌、美國或印度國旗都不能畫。真實火箭上有的話，就用素面取代。
-- 不用畫尾焰、煙霧或發射台，背景透明。
-- 直立、置中，**噴嘴的最底端貼齊圖片底邊**。
+- **No Text, Trademarks, or Flags:** Do not include SpaceX, ISRO, or Rocket Lab logos/lettering, or any national flags. Replace any real-world markings with plain/blank surfaces.
+- Do not draw exhaust plumes, smoke, or launchpads; use a transparent background.
+- Upright and centered, with **the very bottom tip of the engine nozzles aligned flush with the bottom edge of the image**.
 
-## 三、為了分離動畫，構圖必須做到的事
+## 3. Composition Requirements for Stage Separation Animations
 
-1. **一、二節分界**：第一節和第二節之間要有一條清楚的水平分界（級間段的顏色或接縫）。分界以下全部屬於第一節，以上屬於第二節＋整流罩。
-2. **整流罩分界**：整流罩底部和第二節之間要有一條清楚的水平分界。
-3. **兩側助推器**（PSLV、Falcon Heavy）：左右助推器各自是獨立的直條，和中間核心之間要有一條清楚的直向分界（或一點點透明空隙）。左右要對稱。
-4. **Falcon Heavy 三個噴嘴**：三支核心底部各一組引擎，三組要等寬、等距、對稱。
-5. 分界只要「看得出來、是一直線」就好，位置不用照特定比例。交圖時請**註明每條分界的位置**，例如「一二節分界在距離底部 64% 的高度」「左助推器占圖寬的 33%」。沒註明的話，我們也可以自己量。
-
-## 四、交付方式
-
-1. 每枚火箭交一張高解析度原圖（細節完整、透明背景），加上一張照上表尺寸縮好的版本。和前兩輪一樣，縮好的版本要是硬邊像素、透明度只有全透明或不透明。
-2. 附一張預覽圖：四枚火箭在 `#0b0e2b` 背景上並排，**一律縮到 96 px 高**，這是發射畫面上實際的大小，用來確認縮小後還認得出是哪枚火箭。
-3. 檔案放在 `output/rocket-refresh/`，附上第三節要的分界位置說明。
-
-## 五、驗收方式
-
-程式負責人會把火箭套進遊戲，重新對齊分離的切割位置和尾焰，檢查：
-- 選火箭的卡片、發射畫面、手機版都清楚
-- 助推器分離、一二節分離、整流罩分離都切在正確的地方
-- 四枚火箭一眼就分得出來，和真實火箭的特徵相符
+1. **Stage 1 / Stage 2 Seam:** There must be a clear horizontal dividing line between the first and second stages (via interstage color contrast or a panel seam). Everything below this line belongs to Stage 1; everything above belongs to Stage 2 + Fairing.
+2. **Fairing Seam:** There must be a clear horizontal dividing line between the base of the payload fairing and the second stage.
+3. **Side Boosters (PSLV, Falcon Heavy):** The left and right boosters must each form clean vertical columns, separated from the center core by a distinct vertical seam (or a tiny transparent gap). Left and right sides must be symmetrical.
+4. **Falcon Heavy Three Nozzle Clusters:** Each of the three cores has an engine cluster at the bottom; all three clusters must be equal in width, evenly spaced, and symmetrical.
+5. The seams simply need to be "clearly visible and straight"—they do not need to follow fixed proportions. When submitting the files, please **note the coordinates/percentages of each seam** (e.g., "Stage 1/2 seam is at 64% height from the bottom" or "Left booster occupies 33% of image width"). If omitted, we can measure them ourselves.
