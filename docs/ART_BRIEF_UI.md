@@ -1,71 +1,37 @@
-# 美術協作說明（第二輪）— 按鈕與面板外框
+# Art Collaboration Brief — Button & Panel Frames
 
-給協助生成美術的 AI／協作者。第一輪的通用規則（`docs/ART_BRIEF.md` 的「二、工作範圍」「三、硬性規格」「遊戲色票」）全部照舊，這份只補充這一輪的內容。
+## 1. Objective
 
-- 遊戲網址：<https://dean50312-hub.github.io/space-mission-design-game/>
-- GitHub：<https://github.com/dean50312-hub/space-mission-design-game>
+Create **button frames** and **panel frames** for the game UI to give the interface a more polished, tactile feel. Typography will be handled separately by the lead programmer—do not draw any text.
 
-## 一、這一輪要做什麼
+Current frames in `image/ui/`:
+- `button-frame.png` (32×32): Mechanical console style featuring brushed metal, corner screws, and cyan LED borders; shared across all buttons site-wide.
+- `panel-frame.png`, `panel-frame-alert.png`, `panel-frame-gold.png` (16×16): HUD corner brackets in cyan, red (anomaly alerts), and gold (rewards), respectively.
 
-重畫遊戲的**按鈕外框**和**面板外框**，讓介面更有質感。字體由程式負責人另外處理，不用畫。
+Style Direction: **Space Mission Control Console × Pixel Art**. You may reference real spacecraft instrument panels and NASA Mission Control consoles. Keep the designs refined yet restrained—buttons will have text overlaid on top, and panels will contain dense text and telemetry numbers.
 
-現在的外框在 `image/ui/`：
-- `button-frame.png`（32×32）：機械控制台風格，拉絲金屬、四角螺絲、青色 LED 邊線，全站按鈕共用
-- `panel-frame.png`、`panel-frame-alert.png`、`panel-frame-gold.png`（16×16）：四角有 HUD 角括號，分別是青色、紅色（異常警報）、金色（獎勵）
+## 2. Most Important Rule: 9-Slice Scaling
 
-風格方向：**太空任務控制台 × 像素風**。可以參考真實太空船儀表板、NASA 任務控制中心的面板。要比現在更精緻，但不能太花俏，因為按鈕上會壓文字，面板裡也會放大量文字和數字。
+These frames are applied using CSS `border-image` (9-slice scaling): the sprite is divided into 9 regions where **the four corners remain unscaled, the four edges are stretched, and the center region is stretched to fill the interior**. Buttons may be stretched very wide and flat, while panels may be stretched very tall and large. Therefore:
+1. **Four Corners:** Fixed pixel dimensions (see table below); suitable for intricate details.
+2. **Top & Bottom Edges:** Stretched horizontally, so **every vertical column within these strips must be identical**. Patterns may only consist of horizontal lines—no screws, notches, or details that will distort when stretched.
+3. **Left & Right Edges:** Stretched vertically, so **every horizontal row within these strips must be identical**.
+4. **Center Region:** Stretched both horizontally and vertically; **must be a single, solid, 100% opaque color** (acting as the button or panel fill).
+5. The outermost perimeter of the sprite may use fully transparent pixels (to create rounded or chamfered corners), but **no semi-transparent pixels** are allowed.
 
-## 二、最重要的規定：九宮格切圖
+## 3. Asset List
 
-這些外框是用 CSS 的 `border-image`「九宮格」方式套用：圖片被切成 9 塊，**四個角原樣保留，四條邊會被拉長，中間會被拉長填滿**。按鈕可能被拉成很寬很扁，面板可能被拉成很高很大。所以：
-
-```
-┌────┬──────────┬────┐
-│ 角 │  上邊     │ 角 │   ← 角：原樣顯示，可以有細節（螺絲、角括號、LED）
-├────┼──────────┼────┤
-│左邊│  中間     │右邊│   ← 邊：會被拉長，只能沿拉長的方向「完全重複」
-├────┼──────────┼────┤
-│ 角 │  下邊     │ 角 │   ← 中間：上下左右都會被拉長，必須是單一純色
-└────┴──────────┴────┘
-```
-
-1. **四個角**：大小固定（見下表），可以畫細節。
-2. **上邊、下邊**：會被左右拉長，所以這一條裡**每一直行（column）都必須一模一樣**。花紋只能是橫線，不能有螺絲、刻痕這種會被拉長變形的東西。
-3. **左邊、右邊**：會被上下拉長，所以**每一橫列（row）都必須一模一樣**。
-4. **中間**：上下左右都會被拉長，**必須是單一純色、完全不透明**（按鈕底色、面板底色）。
-5. 圖片最外圈可以有透明像素（做出圓角或缺角），但不能有半透明。
-
-## 三、要做的檔案
-
-| 檔名 | 原尺寸 | 角的大小 | 用途 |
+| Filename | Native Size | Corner Size | Usage |
 |---|---|---|---|
-| `ui/button-frame.png` | 24×24 | 6 px | 一般按鈕（返回、設定、次要動作）。中間底色用深色，例如 `#0b0f25` |
-| `ui/button-frame-primary.png` | 24×24 | 6 px | 主要動作按鈕（發射、開始任務）。要比一般按鈕更醒目，例如邊線更亮的青色或帶一點金色 |
-| `ui/button-frame-danger.png` | 24×24 | 6 px | 危險動作（重置進度），紅色系 |
-| `ui/panel-frame.png` | 16×16 | 4 px | 一般面板，青色系。中間底色 `#141838` |
-| `ui/panel-frame-alert.png` | 16×16 | 4 px | 異常警報面板，紅色系，可以更「警示感」 |
-| `ui/panel-frame-gold.png` | 16×16 | 4 px | 獎勵、協商提示面板，金色系 |
-| `ui/card-frame.png`（選做） | 16×16 | 4 px | 零件卡片（目前用 CSS 畫的 2 px 細線框）。要比面板低調 |
-| `ui/card-frame-selected.png`（選做） | 16×16 | 4 px | 被選中的零件卡片，明顯發亮 |
+| `ui/button-frame.png` | 24×24 | 6 px | Standard buttons (Back, Settings, secondary actions). Use a dark center fill, e.g., `#0b0f25`. |
+| `ui/button-frame-primary.png` | 24×24 | 6 px | Primary action buttons (Launch, Start Mission). Must stand out more than standard buttons—e.g., brighter cyan borders or gold accents. |
+| `ui/button-frame-danger.png` | 24×24 | 6 px | Destructive actions (Reset Progress); red color scheme. |
+| `ui/panel-frame.png` | 16×16 | 4 px | Standard panels; cyan color scheme. Center fill: `#141838`. |
+| `ui/panel-frame-alert.png` | 16×16 | 4 px | Anomaly/alert panels; red color scheme with a stronger warning feel. |
+| `ui/panel-frame-gold.png` | 16×16 | 4 px | Reward and negotiation tip panels; gold color scheme. |
+| `ui/card-frame.png` (Optional) | 16×16 | 4 px | Component cards (currently drawn with a 2 px CSS border). Should be more subtle than standard panels. |
+| `ui/card-frame-selected.png` (Optional) | 16×16 | 4 px | Selected component cards; clearly glowing/highlighted. |
 
-- 遊戲會以 **2 倍**顯示這些圖（例如 6 px 的角顯示成 12 px），所以請用很粗、很清楚的像素，不要畫 1 像素的細碎雜點。
-- 按鈕的滑鼠移過、按下、停用狀態由程式處理（變亮、下壓、變灰），不用另外畫。
-- 外框圖裡**不能有任何文字**。
-
-## 四、交付方式
-
-1. 同第一輪：原尺寸 PNG 一份，加上 **8 倍大**的版本一份（24×24 → 192×192，16×16 → 128×128，每個像素是 8×8 的純色方塊），透明背景。
-2. 每個外框附一張**拉伸測試預覽圖**：把它用九宮格方式拉成三種形狀，在 `#0b0e2b` 背景上並排：
-   - 寬扁（例如 360×48，像按鈕）
-   - 窄高（例如 120×240）
-   - 大方塊（例如 400×300，像面板）
-
-   這樣可以一眼看出邊有沒有被拉壞、角和邊接得順不順。
-3. 檔案放在 `output/ui-refresh/` 底下，跟第一輪一樣附一份簡短說明。
-
-## 五、驗收方式
-
-程式負責人會把外框套進遊戲，檢查以下幾點，有問題再請你修改：
-- 主畫面、任務簡報、設計畫面、結果畫面、手機版都看起來協調
-- 按鈕上的文字清楚好讀
-- 拉長後沒有變形
+- The game renders these sprites at **2x scale** (e.g., a 6 px corner renders at 12 px), so use bold, crisp pixel clusters and avoid 1-pixel noisy dithering.
+- Hover, active/pressed, and disabled button states are handled via code (brightening, shifting downward, desaturating)—do not draw separate state sprites.
+- Frames **must not contain any text**.
