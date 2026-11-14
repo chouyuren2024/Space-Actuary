@@ -1,0 +1,1519 @@
+/* =========================================================================
+   任務控制中心風格（2026-11 介面改版）
+   接在 css/style.css 後面載入，只覆蓋視覺與版面；顏色沿用 style.css 的色彩變數。
+   - 面板：深色玻璃底＋細邊框＋四角 L 形括號（用背景漸層畫，不佔偽元素）
+   - 按鈕：切角的控制台按鈕；主要動作是亮青色實心
+   - 背景：淡淡的格線、掃描線與暗角，營造控制台螢幕的感覺
+   ========================================================================= */
+
+:root {
+  --glass: rgba(14, 19, 52, 0.82);
+  --glass-strong: rgba(22, 28, 72, 0.94);
+  --edge: rgba(79, 209, 255, 0.26);
+  --edge-strong: rgba(79, 209, 255, 0.7);
+  --glow-soft: 0 0 22px rgba(79, 209, 255, 0.1);
+  --bracket: 12px;
+}
+
+/* ---------- 背景：格線、光暈、掃描線、暗角 ---------- */
+
+body {
+  background-color: #060920;
+  background-image:
+    radial-gradient(ellipse at 15% -10%, rgba(79, 209, 255, 0.16), transparent 55%),
+    radial-gradient(ellipse at 95% 110%, rgba(179, 136, 255, 0.12), transparent 50%),
+    linear-gradient(rgba(79, 209, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 209, 255, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+  background-attachment: fixed;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 900;
+}
+
+body::before {
+  background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
+}
+
+body::after {
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px);
+}
+
+#app {
+  max-width: 1040px;
+}
+
+#app:has(#screen-selection.active) {
+  max-width: 1280px;
+}
+
+#app:has(#screen-home.active) {
+  max-width: 1180px;
+}
+
+/* ---------- 面板 ---------- */
+
+.panel {
+  --bc: var(--accent);
+  border: 1px solid var(--edge);
+  border-image: none;
+  border-radius: 2px;
+  padding: 14px 16px;
+  background:
+    linear-gradient(var(--bc), var(--bc)) left top / var(--bracket) 2px no-repeat,
+    linear-gradient(var(--bc), var(--bc)) left top / 2px var(--bracket) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) right top / var(--bracket) 2px no-repeat,
+    linear-gradient(var(--bc), var(--bc)) right top / 2px var(--bracket) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) left bottom / var(--bracket) 2px no-repeat,
+    linear-gradient(var(--bc), var(--bc)) left bottom / 2px var(--bracket) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) right bottom / var(--bracket) 2px no-repeat,
+    linear-gradient(var(--bc), var(--bc)) right bottom / 2px var(--bracket) no-repeat,
+    linear-gradient(180deg, var(--glass-strong), var(--glass));
+  box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.panel-alert {
+  --bc: var(--red);
+  border-color: rgba(255, 85, 102, 0.5);
+  border-image: none;
+  box-shadow: 0 0 26px rgba(255, 85, 102, 0.18);
+}
+
+.panel-gold {
+  --bc: var(--gold);
+  border-color: rgba(255, 209, 102, 0.5);
+  border-image: none;
+  box-shadow: 0 0 26px rgba(255, 209, 102, 0.14);
+}
+
+/* ---------- 標題 ---------- */
+
+.screen > h2,
+#screen-results > h2 {
+  font-size: 20px;
+  line-height: 1.4;
+  letter-spacing: 1px;
+  color: var(--text);
+  text-shadow: 0 0 14px rgba(79, 209, 255, 0.45), 2px 2px 0 #060920;
+  padding: 2px 0 2px 14px;
+  border-left: 4px solid var(--accent);
+  margin: 6px 0 20px;
+}
+
+.section-title {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 28px 0 12px;
+}
+
+.section-title::before {
+  width: 6px;
+  height: 6px;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--edge-strong), transparent);
+}
+
+.part-group h3,
+.blueprint-panel > h3 {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ---------- 按鈕：切角控制台按鈕 ---------- */
+
+.btn {
+  border: 1px solid var(--edge-strong);
+  border-image: none;
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(31, 127, 179, 0.24), rgba(10, 14, 42, 0.92));
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  box-shadow: inset 0 0 18px rgba(79, 209, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  padding: 14px 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 0.1s ease, background 0.15s ease, color 0.15s ease, filter 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  filter: none;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(79, 209, 255, 0.34), rgba(14, 22, 60, 0.95));
+  box-shadow: inset 0 0 22px rgba(79, 209, 255, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.btn-primary {
+  color: #04102b;
+  text-shadow: none;
+  border-color: #b8f0ff;
+  background: linear-gradient(180deg, #8fe8ff 0%, #4fd1ff 45%, #1f9fd6 100%);
+  box-shadow: inset 0 -3px 0 rgba(4, 16, 43, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.btn-primary:hover:not(:disabled) {
+  color: #04102b;
+  background: linear-gradient(180deg, #c4f5ff 0%, #6fdcff 45%, #2ab0e6 100%);
+  box-shadow: inset 0 -3px 0 rgba(4, 16, 43, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.btn-primary:disabled {
+  color: var(--text-dim);
+}
+
+.btn-danger {
+  color: var(--red);
+  border-color: rgba(255, 85, 102, 0.7);
+  background: linear-gradient(180deg, rgba(255, 85, 102, 0.2), rgba(30, 10, 30, 0.92));
+}
+
+.btn-danger:hover:not(:disabled) {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(255, 85, 102, 0.4), rgba(40, 10, 30, 0.95));
+}
+
+.btn-small {
+  padding: 8px 14px;
+}
+
+/* ---------- 步驟軌道：像發射倒數的節點 ---------- */
+
+.mission-steps {
+  gap: 0;
+  margin: 0 0 18px;
+}
+
+.mission-steps li {
+  border-top: none;
+  padding: 28px 4px 0;
+  text-align: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 8px;
+}
+
+.mission-steps li::before {
+  content: counter(step);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  font-size: 8px;
+  color: var(--text-faint);
+  background: #060920;
+  border: 1px solid var(--line-strong);
+  z-index: 1;
+}
+
+.mission-steps li::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--line);
+}
+
+.mission-steps[data-current="1"] li:nth-child(1)::before,
+.mission-steps[data-current="2"] li:nth-child(2)::before,
+.mission-steps[data-current="3"] li:nth-child(3)::before,
+.mission-steps[data-current="4"] li:nth-child(4)::before {
+  color: #04102b;
+  background: var(--accent);
+  border-color: #b8f0ff;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.mission-steps[data-current="1"] li:nth-child(1)::after,
+.mission-steps[data-current="2"] li:nth-child(2)::after,
+.mission-steps[data-current="3"] li:nth-child(3)::after,
+.mission-steps[data-current="4"] li:nth-child(4)::after {
+  background: linear-gradient(90deg, var(--accent), var(--line));
+}
+
+.mission-steps[data-current="2"] li:nth-child(-n + 1)::before,
+.mission-steps[data-current="3"] li:nth-child(-n + 2)::before,
+.mission-steps[data-current="4"] li:nth-child(-n + 3)::before {
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.mission-steps[data-current="2"] li:nth-child(-n + 1)::after,
+.mission-steps[data-current="3"] li:nth-child(-n + 2)::after,
+.mission-steps[data-current="4"] li:nth-child(-n + 3)::after {
+  background: var(--accent-deep);
+}
+
+/* ---------- 卡片 ---------- */
+
+.part-card {
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(27, 34, 84, 0.72), rgba(10, 14, 40, 0.88));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.part-card:hover {
+  border-color: var(--edge-strong);
+  box-shadow: 0 0 18px rgba(79, 209, 255, 0.16);
+}
+
+.part-card.selected {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, rgba(31, 127, 179, 0.38), rgba(12, 18, 52, 0.92));
+  box-shadow: 0 0 0 1px var(--accent), 0 0 24px rgba(79, 209, 255, 0.28);
+}
+
+.swatch {
+  border: 1px solid var(--edge);
+  background: radial-gradient(ellipse at 50% 60%, rgba(79, 209, 255, 0.14), transparent 70%), #050819;
+}
+
+.chip {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ---------- 儀表條：分段式 ---------- */
+
+.sheet-bar {
+  height: 8px;
+  background: #050819;
+  border: 1px solid var(--line);
+}
+
+.sheet-bar-fill {
+  background: repeating-linear-gradient(90deg, var(--green) 0 5px, transparent 5px 7px);
+  filter: drop-shadow(0 0 4px rgba(87, 227, 137, 0.5));
+}
+
+.sheet-line.warn .sheet-bar-fill {
+  background: repeating-linear-gradient(90deg, var(--gold) 0 5px, transparent 5px 7px);
+  filter: drop-shadow(0 0 4px rgba(255, 209, 102, 0.5));
+}
+
+.sheet-line.bad .sheet-bar-fill {
+  background: repeating-linear-gradient(90deg, var(--red) 0 5px, transparent 5px 7px);
+  filter: drop-shadow(0 0 4px rgba(255, 85, 102, 0.6));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { display: none; }
+}
+
+/* ---------- 控制台共用小元件：面板標頭列、指示燈、時鐘 ---------- */
+
+.console-head,
+.console-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.console-head {
+  margin: -4px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--edge);
+}
+
+.console-foot {
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--edge);
+}
+
+.console-foot > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.console-clock {
+  margin-left: auto;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.led {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.led-live {
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+  animation: led-blink 1.2s steps(2) infinite;
+}
+
+.led-ok {
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+@keyframes led-blink {
+  50% { opacity: 0.25; }
+}
+
+/* ---------- 首頁：左邊標題＋選單，右邊發射台監視器 ---------- */
+
+.home-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 24px;
+  align-items: stretch;
+  padding-top: 16px;
+}
+
+.home-hero {
+  text-align: left;
+  padding: 8px 0 18px;
+}
+
+.home-eyebrow {
+  color: var(--gold);
+}
+
+.game-title {
+  font-size: 40px;
+  line-height: 1.15;
+  text-shadow: 4px 4px 0 var(--accent-deep), 0 0 28px rgba(79, 209, 255, 0.55);
+}
+
+.game-title-alt {
+  margin: 12px 0 14px;
+}
+
+.home-subtitle {
+  font-size: 15px;
+  max-width: 440px;
+  margin: 0 0 12px;
+}
+
+.home-team {
+  margin: 0;
+}
+
+.home-menu {
+  margin-top: 0;
+}
+
+.home-menu .btn-secondary {
+  text-align: left;
+  padding-left: 22px;
+}
+
+.home-menu .btn-secondary::before {
+  content: "› ";
+  color: var(--accent);
+}
+
+.home-menu-row .btn-secondary {
+  text-align: center;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-size: 8px;
+}
+
+.home-menu-row .btn-secondary::before {
+  content: none;
+}
+
+.home-viewport {
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+
+.viewport-scene {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(179, 136, 255, 0.18), transparent 45%),
+    linear-gradient(180deg, #050716 0%, #0b1238 60%, #12204e 100%);
+}
+
+/* 發射場的地面（和 ui/launchpad.png 的草地同色）與地平線上的晨光 */
+.viewport-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 19px;
+  background: #3e843e;
+  box-shadow: inset 0 2px 0 #5aa85a;
+}
+
+.viewport-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 19px;
+  height: 120px;
+  background: linear-gradient(180deg, transparent, rgba(255, 159, 67, 0.12) 60%, rgba(255, 209, 102, 0.28));
+}
+
+.viewport-planet {
+  position: absolute;
+  width: 96px;
+  right: 8%;
+  top: 10%;
+  animation: float 7s ease-in-out infinite;
+}
+
+.viewport-moon {
+  position: absolute;
+  width: 28px;
+  left: 12%;
+  top: 16%;
+  animation: float 5s ease-in-out infinite reverse;
+}
+
+.viewport-pad {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 240px;
+  height: 230px;
+}
+
+.viewport-launchpad {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  image-rendering: pixelated;
+}
+
+.viewport-rocket {
+  position: absolute;
+  left: 50%;
+  bottom: 19px; /* 發射台台面：ui/launchpad.png 第 62 列，縮成 240 px 寬後離底部 19 px */
+  height: 170px;
+  transform: translateX(-50%);
+  image-rendering: auto;
+  filter: drop-shadow(0 0 10px rgba(79, 209, 255, 0.25));
+}
+
+/* 發射前的液氧排氣：幾團白色蒸氣慢慢飄散 */
+.viewport-steam {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  width: 26px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(232, 236, 255, 0.55);
+  filter: blur(3px);
+  animation: steam 3.6s ease-out infinite;
+}
+
+.viewport-steam.s2 { animation-delay: 1.2s; }
+.viewport-steam.s3 { animation-delay: 2.4s; }
+
+@keyframes steam {
+  0% { transform: translate(-50%, 0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translate(40%, -30px) scale(2.4); opacity: 0; }
+}
+
+/* 監視器準星與掃描線 */
+.viewport-crosshair {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(79, 209, 255, 0.35), rgba(79, 209, 255, 0.35)) 50% 0 / 1px 14px no-repeat,
+    linear-gradient(rgba(79, 209, 255, 0.35), rgba(79, 209, 255, 0.35)) 50% 100% / 1px 14px no-repeat,
+    linear-gradient(rgba(79, 209, 255, 0.35), rgba(79, 209, 255, 0.35)) 0 50% / 14px 1px no-repeat,
+    linear-gradient(rgba(79, 209, 255, 0.35), rgba(79, 209, 255, 0.35)) 100% 50% / 14px 1px no-repeat;
+}
+
+.viewport-crosshair::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(180deg, transparent, rgba(79, 209, 255, 0.08), transparent);
+  animation: scan-sweep 5s linear infinite;
+}
+
+@keyframes scan-sweep {
+  from { top: -40px; }
+  to { top: 100%; }
+}
+
+/* 任務日誌：五種任務並排 */
+.record-tile {
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(27, 34, 84, 0.72), rgba(10, 14, 40, 0.88));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.home-footer {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 860px) {
+  .home-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero {
+    text-align: center;
+  }
+
+  .home-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .home-viewport {
+    min-height: 300px;
+    order: -1;
+  }
+
+  .game-title {
+    font-size: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport-steam,
+  .viewport-crosshair::after,
+  .led-live {
+    animation: none;
+  }
+}
+
+.led-warn {
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+/* ---------- 任務狀態列 ---------- */
+
+.mission-hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 1px;
+  margin: -4px 0 20px;
+  background: var(--edge);
+  border: 1px solid var(--edge);
+}
+
+.mission-hud:empty {
+  display: none;
+}
+
+.hud-cell {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, rgba(20, 26, 66, 0.96), rgba(10, 14, 40, 0.96));
+}
+
+.hud-label {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.hud-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hud-mission {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex: 1.6 1 220px;
+}
+
+.hud-mission img {
+  width: 32px;
+  height: 32px;
+  image-rendering: auto;
+}
+
+.hud-mission > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.hud-alert .hud-value {
+  color: var(--gold);
+}
+
+.hud-meter {
+  flex: 1.2 1 160px;
+}
+
+.hud-bar {
+  display: block;
+  height: 6px;
+  background: #050819;
+  border: 1px solid var(--line);
+}
+
+.hud-bar > span {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--green) 0 5px, transparent 5px 7px);
+}
+
+.hud-meter.warn .hud-bar > span { background: repeating-linear-gradient(90deg, var(--gold) 0 5px, transparent 5px 7px); }
+.hud-meter.bad .hud-bar > span { background: repeating-linear-gradient(90deg, var(--red) 0 5px, transparent 5px 7px); }
+.hud-meter.bad .hud-value { color: var(--red); }
+
+/* ---------- 設計畫面 ---------- */
+
+.blueprint-body {
+  display: grid;
+  grid-template-columns: minmax(300px, 420px) minmax(0, 1fr) minmax(300px, 360px);
+  gap: 18px;
+  align-items: start;
+}
+
+.blueprint-frame {
+  max-width: none;
+  border: 1px solid var(--edge-strong);
+  box-shadow: 0 0 24px rgba(79, 209, 255, 0.12), inset 0 0 40px rgba(79, 209, 255, 0.06);
+}
+
+.blueprint-detail {
+  margin: 0;
+}
+
+/* 預算表固定在畫面上，往下捲動看零件時也看得到 */
+.budget-sheet {
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  margin: 0;
+  min-width: 0;
+}
+
+.sheet-title {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* 期望任務價值：環形儀表 */
+.sheet-headline {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: 14px;
+  background: rgba(5, 8, 25, 0.8);
+  border: 1px solid var(--edge);
+}
+
+.sheet-headline.pending {
+  display: block;
+}
+
+.ev-ring {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+}
+
+.ev-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent) calc(var(--ev) * 1%), rgba(79, 209, 255, 0.12) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  filter: drop-shadow(0 0 6px rgba(79, 209, 255, 0.6));
+}
+
+.ev-ring .sheet-ev-number {
+  font-size: 16px;
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(79, 209, 255, 0.6);
+}
+
+.sheet-ev-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sheet-ev-label {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* 子系統檢查清單 */
+.systems-list {
+  display: grid;
+  gap: 6px;
+}
+
+.systems-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+  background: rgba(5, 8, 25, 0.7);
+  border: 1px solid var(--line);
+}
+
+.systems-row:hover {
+  border-color: var(--edge-strong);
+  background: rgba(31, 127, 179, 0.18);
+}
+
+.systems-name {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.systems-value {
+  font-size: 12px;
+  color: var(--gold);
+}
+
+.systems-row.ok .systems-value {
+  color: var(--green);
+}
+
+@media (max-width: 1100px) {
+  .blueprint-body {
+    grid-template-columns: minmax(280px, 400px) minmax(0, 1fr);
+  }
+
+  .budget-sheet {
+    grid-column: 1 / -1;
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .blueprint-body {
+    grid-template-columns: 1fr;
+  }
+
+  .hud-cell {
+    padding: 6px 8px;
+  }
+}
+
+/* 任務簡報：太空環境事件用金色框，和任務目標區隔 */
+#event-reveal-card {
+  --bc: var(--gold);
+  border-color: rgba(255, 209, 102, 0.4);
+}
+
+/* ---------- 結果頁：任務報告書 ---------- */
+
+.result-score {
+  position: relative;
+  overflow-x: clip; /* 印章的放大進場動畫不要撐出橫向捲軸 */
+}
+
+.score-card {
+  border: 1px solid var(--grade);
+  border-width: 1px;
+  background:
+    linear-gradient(var(--grade), var(--grade)) left top / 14px 3px no-repeat,
+    linear-gradient(var(--grade), var(--grade)) left top / 3px 14px no-repeat,
+    linear-gradient(var(--grade), var(--grade)) right bottom / 14px 3px no-repeat,
+    linear-gradient(var(--grade), var(--grade)) right bottom / 3px 14px no-repeat,
+    linear-gradient(135deg, rgba(27, 34, 84, 0.95), rgba(8, 11, 34, 0.95));
+  box-shadow: 0 0 30px color-mix(in srgb, var(--grade) 25%, transparent);
+  padding: 18px 22px;
+}
+
+/* 任務結果印章 */
+.report-stamp {
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  z-index: 2;
+  padding: 8px 12px;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 3px double currentColor;
+  transform: rotate(-8deg);
+  opacity: 0.85;
+  pointer-events: none;
+  animation: stamp-in 0.4s cubic-bezier(0.2, 1.6, 0.5, 1) 0.5s both;
+}
+
+.report-stamp.success { color: var(--green); }
+.report-stamp.partial { color: var(--gold); }
+.report-stamp.fail { color: var(--red); }
+
+@keyframes stamp-in {
+  from { transform: rotate(-8deg) scale(2.2); opacity: 0; }
+  to { transform: rotate(-8deg) scale(1); opacity: 0.85; }
+}
+
+/* 挑戰勳章三枚並排 */
+.medal-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.medal {
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(27, 34, 84, 0.72), rgba(10, 14, 40, 0.88));
+}
+
+.medal.new {
+  border-color: var(--gold);
+  box-shadow: 0 0 22px rgba(255, 209, 102, 0.3);
+}
+
+.result-report.panel,
+.waterfall-wrap.panel {
+  padding: 16px 18px;
+}
+
+@media (max-width: 720px) {
+  .medal-list {
+    grid-template-columns: 1fr;
+  }
+
+  .medal {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .report-stamp {
+    position: static;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-stamp { animation: none; }
+}
+
+/* 自訂任務卡片：像素字的長單字（例如 Communications）會撐出卡片 */
+.custom-card .part-name {
+  font-size: 10px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* 成就頁：任務名稱太長時，勳章換到下一行，不要撐出畫面 */
+.medal-row {
+  flex-wrap: wrap;
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(27, 34, 84, 0.72), rgba(10, 14, 40, 0.88));
+}
+
+.medal-row-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- 結果頁上半：評分＋交付價值並排 ---------- */
+
+.report-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 8px;
+}
+
+.score-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.score-panel .score-card {
+  flex: 1;
+}
+
+.value-panel {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.value-compare {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.value-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.value-big {
+  font-family: var(--font-pixel);
+  font-size: 32px;
+  line-height: 1;
+  color: var(--text);
+}
+
+.value-big.actual {
+  color: var(--accent);
+  text-shadow: 0 0 14px rgba(79, 209, 255, 0.55);
+}
+
+.value-cap,
+.value-vs {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.value-vs {
+  padding-bottom: 18px;
+}
+
+.value-loss {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px dashed var(--edge);
+}
+
+.value-loss-title {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.value-loss p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* 「價值去哪了」一排五格 */
+.value-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.value-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.value-cell-label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.value-cell-number {
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.value-cell.factorLoss .value-cell-number { color: var(--red); }
+.value-cell.riskLoss .value-cell-number { color: var(--orange); }
+.value-cell.actual .value-cell-number { color: var(--green); }
+
+.value-cell-bar {
+  display: block;
+  height: 8px;
+  background: #050819;
+  border: 1px solid var(--line);
+}
+
+.value-cell-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.value-cell.factorLoss .value-cell-bar > span { background: var(--red); }
+.value-cell.riskLoss .value-cell-bar > span { background: var(--orange); }
+.value-cell.actual .value-cell-bar > span { background: var(--green); }
+
+.waterfall-details > summary {
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+@media (max-width: 860px) {
+  .report-top {
+    grid-template-columns: 1fr;
+  }
+
+  .value-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- 設計圖：引線標註 ---------- */
+
+.blueprint-frame .hotspot-label {
+  display: none;
+}
+
+.callout-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.callout-lines line {
+  stroke: rgba(79, 209, 255, 0.45);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 3 2;
+}
+
+.callout-lines line.active {
+  stroke: var(--accent);
+  stroke-dasharray: none;
+}
+
+.callout {
+  position: absolute;
+  z-index: 3;
+  transform: translateY(-50%);
+  max-width: 28%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 5px 7px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  color: var(--text);
+  background: rgba(6, 9, 32, 0.92);
+  border: 1px solid var(--edge);
+}
+
+.callout-left {
+  right: 72%;
+}
+
+.callout-right {
+  left: 72%;
+}
+
+.callout:hover {
+  border-color: var(--edge-strong);
+}
+
+.callout.active {
+  border-color: var(--accent);
+  background: rgba(31, 127, 179, 0.4);
+  box-shadow: 0 0 12px rgba(79, 209, 255, 0.4);
+}
+
+/* 標註框很窄，像素字放不下 Communications 這種長字，所以用內文字體的粗體大寫 */
+.callout-name {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.callout-value {
+  font-size: 11px;
+  color: var(--gold);
+}
+
+.callout.filled .callout-value {
+  color: var(--green);
+}
+
+/* ---------- 預算表：價值因子兩欄、可靠度三個大數字 ---------- */
+
+.factor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 14px;
+}
+
+.reliability-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.reliability-grid .factor-row {
+  border-bottom: none;
+  padding: 0;
+}
+
+.reliability-grid .factor-row summary {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.reliability-grid .factor-row summary span:last-child {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--accent);
+}
+
+.reliability-grid .factor-row[open] {
+  grid-column: 1 / -1;
+}
+
+/* ---------- 底部固定的操作列 ---------- */
+
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 12px -16px 0;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(6, 9, 32, 0.6), rgba(6, 9, 32, 0.97) 30%);
+  border-top: 1px solid var(--edge);
+  backdrop-filter: blur(4px);
+}
+
+.action-bar .btn {
+  width: auto;
+  margin: 0;
+}
+
+.action-bar #launch-btn {
+  min-width: 200px;
+}
+
+.action-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.action-ev {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.action-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+body:has(.mp-bar:not(.hidden)) .action-bar {
+  bottom: 56px;
+}
+
+@media (max-width: 720px) {
+  .action-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .action-info {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .action-hint {
+    display: none;
+  }
+
+  .action-bar #launch-btn {
+    min-width: 0;
+    order: 0;
+  }
+
+  .factor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sheet-subtitle {
+  font-size: 8px;
+  line-height: 1.6;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 16px 0 6px;
+}
+
+/* ---------- 首頁 B：大地球主視覺（取代發射台監視器） ---------- */
+
+.home-viewport {
+  min-height: 470px;
+}
+
+.home-viewport .viewport-scene {
+  border: none;
+  background: transparent;
+  overflow: visible;
+}
+
+.viewport-glow {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 90%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79, 209, 255, 0.22), transparent 62%);
+}
+
+.viewport-earth-img {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: min(82%, 460px);
+  transform: translateX(-50%);
+  image-rendering: auto;
+  animation: float 9s ease-in-out infinite;
+}
+
+.home-viewport .viewport-ground {
+  height: 19px;
+  left: 6%;
+  right: 6%;
+  border-radius: 1px;
+}
+
+.viewport-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.viewport-status > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-hint {
+  margin: -6px 0 12px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+#home-start-hint.hidden {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .home-viewport {
+    min-height: 340px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport-earth-img { animation: none; }
+}
+
+/* 印章蓋在評分卡右上角外緣，不要壓到分數 */
+.score-panel .report-stamp {
+  top: -14px;
+  right: -6px;
+  padding: 6px 10px;
+  font-size: 8px;
+  background: rgba(6, 9, 32, 0.9);
+}
+
+.score-panel {
+  margin-top: 8px;
+}
+
+.callout-name {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  .callout-name { font-size: 10px; }
+  .callout-value { font-size: 10px; }
+  .action-bar .btn { font-size: 12px; padding: 12px 10px; }
+}
+
+/* ---------- 發射：火箭不再左右搖擺，尾焰改成分層火焰 ----------
+   真實火箭升空時沿著重力轉向的弧線平穩轉向（整組火箭＋尾焰由 js/ascentview.js 一起旋轉），
+   不會左右擺動；引擎噴流是高溫核心＋往外擴散、逐漸變暗的羽流 */
+
+#rocket.flying {
+  animation: none;
+}
+
+.flame {
+  background: none;
+  animation: none;
+}
+
+.flame-glow,
+.flame-plume,
+.flame-core {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform-origin: 50% 0;
+  pointer-events: none;
+}
+
+.flame-glow {
+  width: 360%;
+  height: 120%;
+  top: -12%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 18%, rgba(255, 180, 70, 0.55), rgba(255, 120, 40, 0.18) 40%, transparent 70%);
+  filter: blur(3px);
+  animation: flame-glow 0.9s ease-in-out infinite alternate;
+}
+
+.flame-plume {
+  width: 130%;
+  height: 100%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg,
+    #fff8d6 0%,
+    #ffd166 14%,
+    #ff9f43 36%,
+    rgba(255, 85, 50, 0.8) 62%,
+    rgba(255, 60, 40, 0) 100%);
+  clip-path: polygon(22% 0, 78% 0, 100% 26%, 64% 100%, 36% 100%, 0 26%);
+  filter: blur(0.6px);
+  animation: flame-flicker 0.16s steps(2, jump-none) infinite alternate;
+}
+
+.flame-core {
+  width: 60%;
+  height: 42%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #ffffff 0%, #fff4c2 45%, rgba(255, 236, 160, 0) 100%);
+  border-radius: 40% 40% 50% 50% / 15% 15% 85% 85%;
+  filter: blur(0.4px);
+  animation: flame-flicker 0.11s steps(2, jump-none) infinite alternate-reverse;
+}
+
+.flame:nth-child(2) .flame-plume { animation-duration: 0.19s; }
+.flame:nth-child(3) .flame-plume { animation-duration: 0.14s; }
+
+@keyframes flame-flicker {
+  from { transform: translateX(-50%) scale(0.94, 0.9); opacity: 0.92; }
+  to { transform: translateX(-50%) scale(1.04, 1.06); opacity: 1; }
+}
+
+@keyframes flame-glow {
+  from { opacity: 0.75; }
+  to { opacity: 1; }
+}
+
+/* 低空的馬赫鑽石畫在羽流上面 */
+#exhaust.diamonds .flame::after {
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flame-glow,
+  .flame-plume,
+  .flame-core {
+    animation: none;
+  }
+}
