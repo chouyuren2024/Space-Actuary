@@ -2,7 +2,7 @@
 
 A pixel-art web game for the [NASA Space Apps Challenge 2026 — Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/) challenge, by team Mission Impaysible.
 
-**Play online:** [https://dean50312-hub.github.io/space-mission-design-game/](https://chouyuren2024.github.io/Space-Actuary/)
+**Play online:** [https://chouyuren2024.github.io/Space-Actuary/](https://chouyuren2024.github.io/Space-Actuary/)
 
 You are the mission designer. Within a fixed budget and your rocket's lift capacity, you choose the orbit, the launch vehicle, and every part of the satellite to maximize its **expected mission value** (mission value × probability of success) — which is exactly what an actuary does. Every number comes from real space engineering: the rocket equation, the diffraction limit, orbital geometry, the inverse-square law for radio signals, and real rockets' flight records.
 
