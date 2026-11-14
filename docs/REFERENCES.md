@@ -6,7 +6,7 @@
 
 - [NASA Space Apps Challenge 2026 — Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/) — 官方挑戰頁面，本專案的需求與難度定位依據
 
-## 任務模型 v2 的真實數據（2026-09-30 查證）
+## 任務模型 v2 的真實數據
 
 遊戲的每個機制都對應真實的太空工程原理。下列數字直接寫在 `js/data.js`，括號內是遊戲裡的用法。
 
@@ -116,14 +116,14 @@
 - 迴路熱管：Propylene Loop Heat Pipe Design and Thermal Performance（NASA PACE，梁詠為提供）；大型通訊衛星使用熱管與可展開散熱板為業界常識
 - 衛星熱控綜述：Advances in satellite thermal management systems: Challenges, innovations, and future directions（梁詠為提供）
 
-### 運作期軌道畫面的地球（2026-10-11）
+### 運作期軌道畫面的地球
 
 - 海岸線與冰原：[Natural Earth](https://www.naturalearthdata.com/) 1:110m `ne_110m_land`、`ne_110m_glaciated_areas`（公有領域），以 `tools/earth-texture.py` 轉成 192×48 的北半球像素地圖
 - 北極海冰：每年 3 月最大約 1,400–1,500 萬 km²、9 月最小約 400 萬 km²（[NSIDC Arctic Sea Ice News](https://nsidc.org/arcticseaicenews/)）。遊戲以北緯 77° 以北的海面當作年平均範圍，為**遊戲估算值**。Google Earth 的底圖是拼接的無雲影像加海底地形渲染，不顯示會漂移的海冰；當天真實影像可在 [NASA Worldview](https://worldview.earthdata.nasa.gov/) 查看
 - 太陽同步軌道：550 km 高度傾角約 97.6°；地球觀測衛星常用上午 10:30 降交點
 - 地面站：國家太空中心（新竹，北緯 24.8°、東經 121.0°）。550 km 衛星的地面可視範圍約為 acos(R⊕/r) ≈ 22.6°，所以赤道軌道的低軌衛星永遠不會出現在台灣的地平線上，必須用傾斜軌道
 
-### PSLV 與電離層任務（2026-10-12 查證）
+### PSLV 與電離層任務
 
 - PSLV-XL：1,750 kg 到 620 km SSO、1,425 kg 到次同步轉移軌道（284 × 20,650 km）：[Polar Satellite Launch Vehicle — Wikipedia](https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle)。價格約 ₹130–200 crore（約 $16–29M），NSIL 沒有公布官方報價，**遊戲取 $25M**
 - PSLV 飛行紀錄：PSLV-C62（2026 年 1 月 12 日）是第 64 次發射，第三節異常導致失敗；前一次 PSLV-C61（2025 年 5 月）同樣失敗：[PSLV-C62 / EOS-N1 Mission — ISRO](https://www.isro.gov.in/Mission_PSLV_C62.html)；[ISRO's first 2026 mission PSLV-C62 fails — Deccan Herald](https://www.deccanherald.com/science/space/isros-first-2026-mission-pslv-c62-fails-3859678)。失敗共 4 次（1993、2017、2025、2026）加 1 次部分失敗（1997），遊戲記為 64 次中 59 次成功。截至 2026 年 10 月，下一次發射（C63）尚未進行
@@ -229,7 +229,3 @@
 
 ### 👑 太空全才
 無對應單一真實事件，是遊戲原創的隱藏總成就（集滿其餘 11 個成就解鎖），文字為統整性的致敬語，不引用特定資料來源。
-
-## 使用限制提醒
-
-上面的第三方新聞／百科來源（CNN、Smithsonian、Space.com、Wikipedia 等）僅供你我核對事實使用；正式繳交文件如果要附引用，建議優先引用其中的 **NASA/JPL/ISRO 官方頁面**，第三方來源作為輔助佐證即可。
