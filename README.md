@@ -20,6 +20,9 @@ You are the mission designer. Within a fixed budget and your rocket's lift capac
 - **Custom mode, Space Codex, and quizzes:** pick any mission and event; read full write-ups of every rocket, part, event, and science concept; check the learning goals with a short quiz after each mission.
 - Works on desktop and mobile.
 
+##  Educational Impact
+Space Actuary aims to make space-mission design accessible to students with no prior knowledge of space science or engineering. In-game hints guide beginners through mission planning and help them understand the reasoning behind their choices. After each mission, short quizzes encourage players to revisit key concepts and connect them with their gameplay experience. Together, guided exploration and post-mission review are designed to reinforce understanding and retention of mission-related knowledge, providing an approachable introduction to space systems engineering.
+
 ## Introduction
 ![image](https://github.com/chouyuren2024/Space-Actuary/blob/c74b282b9927cdd7caa3e12f45a585ab9285a45c/image/PPT/Space%20Actuary%20introduction%20slide.png)
 ![image](https://github.com/chouyuren2024/Space-Actuary/blob/c74b282b9927cdd7caa3e12f45a585ab9285a45c/image/PPT/Space%20Actuary%20introduction%20slide%20(1).png)
