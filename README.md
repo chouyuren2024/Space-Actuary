@@ -20,6 +20,14 @@ You are the mission designer. Within a fixed budget and your rocket's lift capac
 - **Custom mode, Space Codex, and quizzes:** pick any mission and event; read full write-ups of every rocket, part, event, and science concept; check the learning goals with a short quiz after each mission.
 - Works on desktop and mobile.
 
+## Introduction
+![image](https://github.com/chouyuren2024/Space-Actuary/blob/c74b282b9927cdd7caa3e12f45a585ab9285a45c/image/PPT/Space%20Actuary%20introduction%20slide.png)
+![image](https://github.com/chouyuren2024/Space-Actuary/blob/c74b282b9927cdd7caa3e12f45a585ab9285a45c/image/PPT/Space%20Actuary%20introduction%20slide%20(1).png)
+![image](https://github.com/chouyuren2024/Space-Actuary/blob/c74b282b9927cdd7caa3e12f45a585ab9285a45c/image/PPT/Space%20Actuary%20introduction%20slide%20(2).png)
+![image](https://github.com/chouyuren2024/Space-Actuary/blob/c74b282b9927cdd7caa3e12f45a585ab9285a45c/image/PPT/Space%20Actuary%20introduction%20slide%20(3).png)
+![image](https://github.com/chouyuren2024/Space-Actuary/blob/c74b282b9927cdd7caa3e12f45a585ab9285a45c/image/PPT/Space%20Actuary%20introduction%20slide%20(4).png)
+![image](https://github.com/chouyuren2024/Space-Actuary/blob/c74b282b9927cdd7caa3e12f45a585ab9285a45c/image/PPT/Space%20Actuary%20introduction%20slide%20(5).png)
+
 ## Running locally
 
 No build step or packages needed — serve the project folder with any static web server:
